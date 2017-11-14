@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Olga Baryshnikova](https://up.htmlacademy.ru/javascript/11/user/121563).
-* Наставник: `Неизвестно`.
+* Наставник: [Андрей Дос](https://up.htmlacademy.ru/javascript/11/user/167992).
 
 ---
 
