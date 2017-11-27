@@ -49,6 +49,8 @@ var getRandomArray = function (array) {
 var createNearByArray = function (numberOfOffers, offersInfo) {
   var nearBy = [];
   for (var i = 0; i < numberOfOffers; i++) {
+    var x = getRandomArbitary(LOCATION_MIN_MAX.x.min, LOCATION_MIN_MAX.x.max) + PIN_HALF_WIDTH;
+    var y = getRandomArbitary(LOCATION_MIN_MAX.y.min, LOCATION_MIN_MAX.y.max) + PIN_HEIGHT;
     nearBy[i] =
       {
         author: {
@@ -56,10 +58,7 @@ var createNearByArray = function (numberOfOffers, offersInfo) {
         },
         offer: {
           title: getRandomValue(offersInfo.title),
-
-          // Ясно, что это та не работает, но откуда вытащить эти данные? О_О
-          // address: nearBy[i].location.x + ' ' + nearBy[i].location.y,
-          address: 'I am here temporary ^_^',
+          address: x + ', ' + y,
           price: getRandomArbitary(PRICE_MIN_MAX.min, PRICE_MIN_MAX.max),
           type: getRandomValue(offersInfo.type),
           rooms: getRandomArbitary(ROOMS_GUESTS_MIN_MAX.min, ROOMS_GUESTS_MIN_MAX.max),
@@ -71,8 +70,8 @@ var createNearByArray = function (numberOfOffers, offersInfo) {
           photos: []
         },
         location: {
-          x: getRandomArbitary(LOCATION_MIN_MAX.x.min, LOCATION_MIN_MAX.x.max) + PIN_HALF_WIDTH,
-          y: getRandomArbitary(LOCATION_MIN_MAX.y.min, LOCATION_MIN_MAX.y.max) + PIN_HEIGHT
+          x: x,
+          y: y
         }
       };
   }
@@ -110,7 +109,7 @@ var createOffer = function () {
   getOffer.querySelector('small').textContent = nearBy[0].offer.address;
   getOffer.querySelector('.popup__price').textContent = nearBy[0].offer.price + '₽/ночь';
   getOffer.querySelector('h4').textContent = nearBy[0].offer.type[1];
-  // здесь можно добавить проверку на правильное написания гостя / гостей, комната / комнаты
+  // оставляю с комнатами, ибо в темплейте так, я думаю в задании просто не дописали комнаты
   getOffer.querySelector('p:nth-of-type(3)').textContent = nearBy[0].offer.rooms + ' комнаты для ' + nearBy[0].offer.guests + ' гостей';
   getOffer.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + nearBy[0].offer.checkin + ', выезд до ' + nearBy[0].offer.checkout;
   getOffer.querySelector('p:nth-of-type(5)').textContent = nearBy[0].offer.description;
@@ -121,7 +120,6 @@ var createOffer = function () {
   for (var j = 0; j < nearBy[0].offer.features.length; j++) {
     getOffer.querySelector('.popup__features').insertAdjacentHTML('afterbegin', '<li class="feature feature--' + nearBy[0].offer.features[j] + '"></li>');
   }
-
   return getOffer;
 };
 
