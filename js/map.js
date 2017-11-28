@@ -31,18 +31,17 @@ var LOCATION_MIN_MAX = {
   }
 };
 
-var getRandomArbitary = function (min, max) {
+var getRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 };
-var getRandomValue = function (array) {
+var getRandomFeaturesItem = function (array) {
   return array[Math.floor(Math.random() * array.length)];
 };
 
-var getRandomArray = function (array) {
+var getRandomFeatures = function (array) {
   var features = [];
   for (var i = 0; i < array.length; i++) {
-    var chance = Math.random();
-    if (chance < 0.5) {
+    if (Math.random() < 0.5) {
       features.push(array[i]);
     }
   }
@@ -56,23 +55,23 @@ var getKeyValue = function (obj, key) {
 var createNearByArray = function (numberOfOffers, offersInfo) {
   var nearBy = [];
   for (var i = 0; i < numberOfOffers; i++) {
-    var x = getRandomArbitary(LOCATION_MIN_MAX.x.min, LOCATION_MIN_MAX.x.max);
-    var y = getRandomArbitary(LOCATION_MIN_MAX.y.min, LOCATION_MIN_MAX.y.max) - PIN_HEIGHT;
+    var x = getRandomNumber(LOCATION_MIN_MAX.x.min, LOCATION_MIN_MAX.x.max);
+    var y = getRandomNumber(LOCATION_MIN_MAX.y.min, LOCATION_MIN_MAX.y.max) - PIN_HEIGHT;
     nearBy[i] =
       {
         author: {
           avatar: 'img/avatars/user0' + (i + 1) + '.png'
         },
         offer: {
-          title: getRandomValue(offersInfo.title),
+          title: getRandomFeaturesItem(offersInfo.title),
           address: x + ', ' + y,
-          price: getRandomArbitary(PRICE_MIN_MAX.min, PRICE_MIN_MAX.max),
-          type: getRandomValue(Object.keys(offersInfo.type)),
-          rooms: getRandomArbitary(ROOMS_GUESTS_MIN_MAX.min, ROOMS_GUESTS_MIN_MAX.max),
-          guests: getRandomArbitary(ROOMS_GUESTS_MIN_MAX.min, ROOMS_GUESTS_MIN_MAX.max),
-          checkin: getRandomValue(offersInfo.checkinout),
-          checkout: getRandomValue(offersInfo.checkinout),
-          features: getRandomArray(offersInfo.features),
+          price: getRandomNumber(PRICE_MIN_MAX.min, PRICE_MIN_MAX.max),
+          type: getRandomFeaturesItem(Object.keys(offersInfo.type)),
+          rooms: getRandomNumber(ROOMS_GUESTS_MIN_MAX.min, ROOMS_GUESTS_MIN_MAX.max),
+          guests: getRandomNumber(ROOMS_GUESTS_MIN_MAX.min, ROOMS_GUESTS_MIN_MAX.max),
+          checkin: getRandomFeaturesItem(offersInfo.checkinout),
+          checkout: getRandomFeaturesItem(offersInfo.checkinout),
+          features: getRandomFeatures(offersInfo.features),
           description: '',
           photos: []
         },
@@ -107,17 +106,18 @@ for (var i = 0; i < nearBy.length; i++) {
   fragment.appendChild(createPin(nearBy[i]));
 }
 mapPins.appendChild(fragment);
-var firstOffer = nearBy[0];
+
 var createOffer = function (offerData) {
   var getOffer = offerTemplate.cloneNode(true);
+  var offer = offerData.offer;
 
-  getOffer.querySelector('h3').textContent = offerData.offer.title;
-  getOffer.querySelector('small').textContent = offerData.offer.address;
-  getOffer.querySelector('.popup__price').textContent = offerData.offer.price + '₽/ночь';
-  getOffer.querySelector('h4').textContent = getKeyValue(OFFERS_INFO.type, firstOffer.offer.type);
-  getOffer.querySelector('p:nth-of-type(3)').textContent = offerData.offer.rooms + ' комнаты для ' + firstOffer.offer.guests + ' гостей';
-  getOffer.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + offerData.offer.checkin + ', выезд до ' + firstOffer.offer.checkout;
-  getOffer.querySelector('p:nth-of-type(5)').textContent = offerData.offer.description;
+  getOffer.querySelector('h3').textContent = offer.title;
+  getOffer.querySelector('small').textContent = offer.address;
+  getOffer.querySelector('.popup__price').textContent = offer.price + '₽/ночь';
+  getOffer.querySelector('h4').textContent = getKeyValue(OFFERS_INFO.type, offer.type);
+  getOffer.querySelector('p:nth-of-type(3)').textContent = offer.rooms + ' комнаты для ' + offer.guests + ' гостей';
+  getOffer.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + offer.checkin + ', выезд до ' + offer.checkout;
+  getOffer.querySelector('p:nth-of-type(5)').textContent = offer.description;
   getOffer.querySelector('img').src = offerData.author.avatar;
 
   getOffer.querySelector('.popup__features').innerHTML = '';
@@ -129,7 +129,7 @@ var createOffer = function (offerData) {
   getOffer.querySelector('.popup__features').insertAdjacentHTML('afterbegin', featuresHtmlString);
   return getOffer;
 };
-
+var firstOffer = nearBy[0];
 fragment.appendChild(createOffer(firstOffer));
 map.insertBefore(fragment, map.children[1]);
 
