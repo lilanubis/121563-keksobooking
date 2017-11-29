@@ -34,7 +34,7 @@ var LOCATION_MIN_MAX = {
 var getRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 };
-var getRandomFeaturesItem = function (array) {
+var getRandomArrayItem = function (array) {
   return array[Math.floor(Math.random() * array.length)];
 };
 
@@ -63,14 +63,14 @@ var createNearByArray = function (numberOfOffers, offersInfo) {
           avatar: 'img/avatars/user0' + (i + 1) + '.png'
         },
         offer: {
-          title: getRandomFeaturesItem(offersInfo.title),
+          title: getRandomArrayItem(offersInfo.title),
           address: x + ', ' + y,
           price: getRandomNumber(PRICE_MIN_MAX.min, PRICE_MIN_MAX.max),
-          type: getRandomFeaturesItem(Object.keys(offersInfo.type)),
+          type: getRandomArrayItem(Object.keys(offersInfo.type)),
           rooms: getRandomNumber(ROOMS_GUESTS_MIN_MAX.min, ROOMS_GUESTS_MIN_MAX.max),
           guests: getRandomNumber(ROOMS_GUESTS_MIN_MAX.min, ROOMS_GUESTS_MIN_MAX.max),
-          checkin: getRandomFeaturesItem(offersInfo.checkinout),
-          checkout: getRandomFeaturesItem(offersInfo.checkinout),
+          checkin: getRandomArrayItem(offersInfo.checkinout),
+          checkout: getRandomArrayItem(offersInfo.checkinout),
           features: getRandomFeatures(offersInfo.features),
           description: '',
           photos: []
@@ -90,8 +90,8 @@ var mapPins = document.querySelector('.map__pins');
 var pinTemplate = document.querySelector('template').content.querySelector('.map__pin');
 var offerTemplate = document.querySelector('template').content.querySelector('.map__card');
 
-var createPin = function (pinData) {
-  var pin = pinTemplate.cloneNode(true);
+var createPin = function (pinData, template) {
+  var pin = template.cloneNode(true);
 
   pin.style.left = pinData.location.x + 'px';
   pin.style.top = pinData.location.y + 'px';
@@ -103,12 +103,12 @@ var createPin = function (pinData) {
 var fragment = document.createDocumentFragment();
 
 for (var i = 0; i < nearBy.length; i++) {
-  fragment.appendChild(createPin(nearBy[i]));
+  fragment.appendChild(createPin(nearBy[i], pinTemplate));
 }
 mapPins.appendChild(fragment);
 
-var createOffer = function (offerData) {
-  var getOffer = offerTemplate.cloneNode(true);
+var createOffer = function (offerData, template) {
+  var getOffer = template.cloneNode(true);
   var offer = offerData.offer;
 
   getOffer.querySelector('h3').textContent = offer.title;
@@ -130,7 +130,7 @@ var createOffer = function (offerData) {
   return getOffer;
 };
 var firstOffer = nearBy[0];
-fragment.appendChild(createOffer(firstOffer));
+fragment.appendChild(createOffer(firstOffer, offerTemplate));
 map.insertBefore(fragment, map.children[1]);
 
 document.querySelector('.map').classList.remove('map--faded');
