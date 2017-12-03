@@ -32,6 +32,10 @@ var LOCATION_MIN_MAX = {
   }
 };
 
+// константы для кнопок на клаве
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+
 // переменные для объектов, которые есть в Доме изначально
 var map = document.querySelector('.map');
 var mainPin = map.querySelector('.map__pin--main');
@@ -109,36 +113,62 @@ var createNearByArray = function (numberOfOffers, offersInfo) {
 // собираем массив NearBy из реальных данных
 var nearBy = createNearByArray(NUMBER_OF_OFFERS, OFFERS_INFO);
 
+var elementExists = null;
+
+// что происходит при открытии пина
+var pinOpen = function (evt) {
+  if (elementExists === null) {
+    var target = evt.target;
+    console.log(target);
+
+    // получаем номер нужного объекта в nearBy для соответствия карточки пину
+    var currentNumber = (target.src.toString()).split('/');
+    currentNumber = Number((currentNumber[currentNumber.length - 1]).match(/\d+/g));
+
+    createActiveOffer(nearBy[currentNumber - 1]);
+
+    var pin = target.closest('.map__pin');
+    pin.classList.add('map__pin--active');
+
+    elementExists = document.querySelector('.popup');
+    var popUpClose = elementExists.querySelector('.popup__close');
+
+    // что происходит при закрытии карточки
+    var popupClose = function () {
+      elementExists.remove();
+      elementExists = null;
+      pin.classList.remove('map__pin--active');
+    };
+
+    // если нажали на Esc
+    var popupEscHandler = function (event) {
+      if (event.keyCode === ESC_KEYCODE) {
+        popupClose();
+      }
+    };
+
+    popUpClose.addEventListener('click', popupClose);
+    map.addEventListener('keydown', popupEscHandler);
+  }
+};
+
+var pinEnterHandler = function (evt) {
+  if (evt.target === ENTER_KEYCODE) {
+    pinOpen();
+  }
+};
+
 // собираем шаблон пина
 var createPin = function (pinData, template) {
   var pin = template.cloneNode(true);
   pin.style.left = pinData.location.x + 'px';
   pin.style.top = pinData.location.y + 'px';
   pin.querySelector('img').src = pinData.author.avatar;
-  pin.addEventListener('click', pinClickHandler);
+  pin.pinData = pinData;
+  pin.addEventListener('click', pinOpen);
+  pin.addEventListener('keydown', pinEnterHandler);
 
   return pin;
-};
-
-// что происходит с пином по клику
-var pinClickHandler = function (evt) {
-  var elementExists = document.querySelector('.popup');
-  if (elementExists === null) {
-    var target = evt.target;
-    // внимание, я знаю, что это решение безумно и неправильно, но оно работает!! я просто хотела это сделать как угодно и нашла способ!!
-    // дайте мне приз за самое безумное решение!!!
-    var src = (target.src.toString()).split('/');
-    src = Number((src[src.length - 1]).match(/\d+/g));
-    var pin = target.closest('.map__pin');
-    pin.classList.add('map__pin--active');
-    createActiveOffer(nearBy[src - 1]);
-    var popUpClose = map.querySelector('.popup__close');
-    var popup = map.querySelector('.popup');
-    popUpClose.addEventListener('click', function () {
-      popup.remove();
-      pin.classList.remove('map__pin--active');
-    });
-  }
 };
 
 // собираем все пины из реальных данных
@@ -174,7 +204,7 @@ var createOffer = function (offerData, template) {
   return getOffer;
 };
 
-// cоздаем одну активную карточку
+// cоздаем шаблон одной активной карточки
 var createActiveOffer = function (offer) {
   var fragmentCard = document.createDocumentFragment();
   fragmentCard.appendChild(createOffer(offer, offerTemplate));
