@@ -113,48 +113,60 @@ var createNearByArray = function (numberOfOffers, offersInfo) {
 // собираем массив NearBy из реальных данных
 var nearBy = createNearByArray(NUMBER_OF_OFFERS, OFFERS_INFO);
 
-var elementExists = null;
+// добавляем пустой попап
+var activePopup = null;
 
 // что происходит при открытии пина
 var pinOpen = function (evt) {
-  if (elementExists === null) {
-    var target = evt.target;
-    if (target.classList.contains('map__pin')) {
-      var img = target.querySelector('img');
-
-      // получаем номер нужного объекта в nearBy для соответствия карточки пину
-      var currentNumber = (img.src.toString()).split('/');
-      currentNumber = Number((currentNumber[currentNumber.length - 1]).match(/\d+/g));
-    }
-    else {
-      // получаем номер нужного объекта в nearBy для соответствия карточки пину
-      currentNumber = (target.src.toString()).split('/');
-      currentNumber = Number((currentNumber[currentNumber.length - 1]).match(/\d+/g));
-    }
-
-    createActiveOffer(nearBy[currentNumber - 1]);
-
-    var pin = target.closest('.map__pin');
+  if (activePopup === null) {
+    var pinData = evt.currentTarget.pinData;
+    var pin = evt.currentTarget;
+    activePopup = createActiveOffer(pinData, offerTemplate);
     pin.classList.add('map__pin--active');
 
-    elementExists = document.querySelector('.popup');
-    var popUpClose = elementExists.querySelector('.popup__close');
+    var popupCloseButton = activePopup.querySelector('.popup__close');
 
     // что происходит при закрытии карточки
-    var popupClose = function () {
-      elementExists.remove();
-      elementExists = null;
+    var popupRemove = function () {
+      activePopup.remove();
+      activePopup = null;
       pin.classList.remove('map__pin--active');
+      popupCloseButton.removeEventListener('click', popupRemove);
+      map.removeEventListener('keydown', popupEscHandler);
     };
 
     // если нажали на Esc
     var popupEscHandler = function (event) {
-      if (event.keyCode === ESC_KEYCODE) {
-        popupClose();
+      if (event.keyCode === ESC_KEYCODE || event.keyCode === ENTER_KEYCODE) {
+        popupRemove();
+        activePopup = createActiveOffer(pinData, offerTemplate);
+        pin.classList.add('map__pin--active');
       }
     };
 
-    popUpClose.addEventListener('click', popupClose);
+    //  если нажали на enter на крестике
+    var closePopupEnterHandler = function (event) {
+      if (event.target === ENTER_KEYCODE) {
+        popupRemove();
+      }
+    };
+
+    // слушаем клики
+    popupCloseButton.addEventListener('click', popupRemove);
+    map.addEventListener('keydown', popupEscHandler);
+    popupCloseButton.addEventListener('keydown', closePopupEnterHandler);
+
+  } else {
+    activePopup.remove();
+    activePopup = null;
+    map.querySelector('.map__pin--active').classList.remove('map__pin--active');
+    pin = evt.currentTarget;
+    pinData = evt.currentTarget.pinData;
+    activePopup = createActiveOffer(pinData, offerTemplate);
+
+    pin.classList.add('map__pin--active');
+    popupCloseButton = activePopup.querySelector('.popup__close');
+    popupCloseButton.addEventListener('click', popupRemove);
     map.addEventListener('keydown', popupEscHandler);
   }
 };
@@ -213,10 +225,9 @@ var createOffer = function (offerData, template) {
 };
 
 // cоздаем шаблон одной активной карточки
-var createActiveOffer = function (offer) {
-  var fragmentCard = document.createDocumentFragment();
-  fragmentCard.appendChild(createOffer(offer, offerTemplate));
-  map.insertBefore(fragmentCard, map.children[1]);
+var createActiveOffer = function (offer, template) {
+  var offerElement = createOffer(offer, template);
+  return map.insertBefore(offerElement, map.children[1]);
 };
 
 // создаем события для шелчка по главному Пину
