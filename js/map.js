@@ -119,11 +119,18 @@ var elementExists = null;
 var pinOpen = function (evt) {
   if (elementExists === null) {
     var target = evt.target;
-    console.log(target);
+    if (target.classList.contains('map__pin')) {
+      var img = target.querySelector('img');
 
-    // получаем номер нужного объекта в nearBy для соответствия карточки пину
-    var currentNumber = (target.src.toString()).split('/');
-    currentNumber = Number((currentNumber[currentNumber.length - 1]).match(/\d+/g));
+      // получаем номер нужного объекта в nearBy для соответствия карточки пину
+      var currentNumber = (img.src.toString()).split('/');
+      currentNumber = Number((currentNumber[currentNumber.length - 1]).match(/\d+/g));
+    }
+    else {
+      // получаем номер нужного объекта в nearBy для соответствия карточки пину
+      currentNumber = (target.src.toString()).split('/');
+      currentNumber = Number((currentNumber[currentNumber.length - 1]).match(/\d+/g));
+    }
 
     createActiveOffer(nearBy[currentNumber - 1]);
 
@@ -152,6 +159,7 @@ var pinOpen = function (evt) {
   }
 };
 
+// если нажали на Enter
 var pinEnterHandler = function (evt) {
   if (evt.target === ENTER_KEYCODE) {
     pinOpen();
