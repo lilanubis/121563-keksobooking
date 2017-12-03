@@ -1,5 +1,6 @@
 'use strict';
 
+// константы для создания объекта nearBy
 var NUMBER_OF_OFFERS = 8;
 var OFFERS_INFO = {
   title: ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'],
@@ -31,36 +32,57 @@ var LOCATION_MIN_MAX = {
   }
 };
 
+// переменные для объектов, которые есть в Доме изначально
+var map = document.querySelector('.map');
+var mainPin = map.querySelector('.map__pin--main');
+var noticeForm = document.querySelector('.notice__form');
+var fieldsets = document.querySelectorAll('fieldset');
+var mapPins = document.querySelector('.map__pins');
+var pinTemplate = document.querySelector('template').content.querySelector('.map__pin');
+var offerTemplate = document.querySelector('template').content.querySelector('.map__card');
+
+// сделаем все поля формы disabled изначально
+for (var i = 0; i < fieldsets.length; i++) {
+  fieldsets[i].setAttribute('disabled', 'disabled');
+}
+
+// вспомогательные функции
+// выбрать случайное число от.. до..
 var getRandomNumber = function (min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 };
+
+// выбрать случайный элемент массива
 var getRandomArrayItem = function (array) {
   return array[Math.floor(Math.random() * array.length)];
 };
 
-var getRandomFeatures = function (array) {
-  var features = [];
-  for (var i = 0; i < array.length; i++) {
+// собрать массив случайных элементов из другого массива
+var getRandomElementsArray = function (array) {
+  var newArray = [];
+  for (var j = 0; j < array.length; j++) {
     if (Math.random() < 0.5) {
-      features.push(array[i]);
+      newArray.push(array[j]);
     }
   }
-  return features;
+  return newArray;
 };
 
+// взять ключ от объекта
 var getKeyValue = function (obj, key) {
   return obj[key];
 };
 
+// собираем шаблон массива NearBy
 var createNearByArray = function (numberOfOffers, offersInfo) {
   var nearBy = [];
-  for (var i = 0; i < numberOfOffers; i++) {
+  for (var k = 0; k < numberOfOffers; k++) {
     var x = getRandomNumber(LOCATION_MIN_MAX.x.min, LOCATION_MIN_MAX.x.max);
     var y = getRandomNumber(LOCATION_MIN_MAX.y.min, LOCATION_MIN_MAX.y.max) - PIN_HEIGHT;
-    nearBy[i] =
+    nearBy[k] =
       {
         author: {
-          avatar: 'img/avatars/user0' + (i + 1) + '.png'
+          avatar: 'img/avatars/user0' + (k + 1) + '.png'
         },
         offer: {
           title: getRandomArrayItem(offersInfo.title),
@@ -71,7 +93,7 @@ var createNearByArray = function (numberOfOffers, offersInfo) {
           guests: getRandomNumber(ROOMS_GUESTS_MIN_MAX.min, ROOMS_GUESTS_MIN_MAX.max),
           checkin: getRandomArrayItem(offersInfo.checkinout),
           checkout: getRandomArrayItem(offersInfo.checkinout),
-          features: getRandomFeatures(offersInfo.features),
+          features: getRandomElementsArray(offersInfo.features),
           description: '',
           photos: []
         },
@@ -83,30 +105,52 @@ var createNearByArray = function (numberOfOffers, offersInfo) {
   }
   return nearBy;
 };
+
+// собираем массив NearBy из реальных данных
 var nearBy = createNearByArray(NUMBER_OF_OFFERS, OFFERS_INFO);
 
-var map = document.querySelector('.map');
-var mapPins = document.querySelector('.map__pins');
-var pinTemplate = document.querySelector('template').content.querySelector('.map__pin');
-var offerTemplate = document.querySelector('template').content.querySelector('.map__card');
-
+// собираем шаблон пина
 var createPin = function (pinData, template) {
   var pin = template.cloneNode(true);
-
   pin.style.left = pinData.location.x + 'px';
   pin.style.top = pinData.location.y + 'px';
   pin.querySelector('img').src = pinData.author.avatar;
+  pin.addEventListener('click', pinClickHandler);
 
   return pin;
 };
 
-var fragment = document.createDocumentFragment();
+// что происходит с пином по клику
+var pinClickHandler = function (evt) {
+  var elementExists = document.querySelector('.popup');
+  if (elementExists === null) {
+    var target = evt.target;
+    // внимание, я знаю, что это решение безумно и неправильно, но оно работает!! я просто хотела это сделать как угодно и нашла способ!!
+    // дайте мне приз за самое безумное решение!!!
+    var src = (target.src.toString()).split('/');
+    src = Number((src[src.length - 1]).match(/\d+/g));
+    var pin = target.closest('.map__pin');
+    pin.classList.add('map__pin--active');
+    createActiveOffer(nearBy[src - 1]);
+    var popUpClose = map.querySelector('.popup__close');
+    var popup = map.querySelector('.popup');
+    popUpClose.addEventListener('click', function () {
+      popup.remove();
+      pin.classList.remove('map__pin--active');
+    });
+  }
+};
 
-for (var i = 0; i < nearBy.length; i++) {
-  fragment.appendChild(createPin(nearBy[i], pinTemplate));
-}
-mapPins.appendChild(fragment);
+// собираем все пины из реальных данных
+var createAllPins = function () {
+  var fragmentPin = document.createDocumentFragment();
+  for (var l = 0; l < nearBy.length; l++) {
+    fragmentPin.appendChild(createPin(nearBy[l], pinTemplate));
+  }
+  mapPins.appendChild(fragmentPin);
+};
 
+// собираем шаблон карточки с предложением
 var createOffer = function (offerData, template) {
   var getOffer = template.cloneNode(true);
   var offer = offerData.offer;
@@ -123,14 +167,30 @@ var createOffer = function (offerData, template) {
   getOffer.querySelector('.popup__features').innerHTML = '';
 
   var featuresHtmlString = '';
-  for (var j = 0; j < firstOffer.offer.features.length; j++) {
-    featuresHtmlString += '<li class="feature feature--' + firstOffer.offer.features[j] + '"></li>';
+  for (var j = 0; j < offerData.offer.features.length; j++) {
+    featuresHtmlString += '<li class="feature feature--' + offerData.offer.features[j] + '"></li>';
   }
   getOffer.querySelector('.popup__features').insertAdjacentHTML('afterbegin', featuresHtmlString);
   return getOffer;
 };
-var firstOffer = nearBy[0];
-fragment.appendChild(createOffer(firstOffer, offerTemplate));
-map.insertBefore(fragment, map.children[1]);
 
-document.querySelector('.map').classList.remove('map--faded');
+// cоздаем одну активную карточку
+var createActiveOffer = function (offer) {
+  var fragmentCard = document.createDocumentFragment();
+  fragmentCard.appendChild(createOffer(offer, offerTemplate));
+  map.insertBefore(fragmentCard, map.children[1]);
+};
+
+// создаем события для шелчка по главному Пину
+var mainPinMouseupHandler = function () {
+  mainPin.removeEventListener('mouseup', mainPinMouseupHandler);
+  createAllPins();
+  document.querySelector('.map').classList.remove('map--faded');
+  noticeForm.classList.remove('notice__form--disabled');
+  for (var j = 0; j < fieldsets.length; j++) {
+    fieldsets[j].removeAttribute('disabled', 'disabled');
+  }
+};
+
+// щелкаем по главному пину
+mainPin.addEventListener('mouseup', mainPinMouseupHandler);
