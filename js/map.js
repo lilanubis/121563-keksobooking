@@ -116,36 +116,40 @@ var nearBy = createNearByArray(NUMBER_OF_OFFERS, OFFERS_INFO);
 // добавляем пустой попап
 var activePopup = null;
 
+// добавляем активный пин
+var activePin = null;
+
+// что происходит при закрытии карточки
+var popupRemoveHandler = function () {
+  activePin.classList.remove('map__pin--active');
+  var popupCloseButton = activePopup.querySelector('.popup__close');
+  popupCloseButton.removeEventListener('click', popupRemoveHandler);
+  map.removeEventListener('keydown', popupEscHandler);
+  activePopup.remove();
+  activePopup = null;
+};
+
+  // если нажали на Esc или на enter по крестику
+var popupEscHandler = function (event) {
+  if (event.keyCode === ESC_KEYCODE || event.keyCode === ENTER_KEYCODE) {
+    popupRemoveHandler();
+  }
+};
+
+  //  если нажали на enter на крестике
+var closePopupEnterHandler = function (event) {
+  if (event.target === ENTER_KEYCODE) {
+    popupRemoveHandler();
+  }
+};
+
 // что происходит при открытии пина
 var pinOpenHandler = function (evt) {
-
-  // что происходит при закрытии карточки
-  var popupRemoveHandler = function () {
-    activePin.classList.remove('map__pin--active');
-    popupCloseButton.removeEventListener('click', popupRemoveHandler);
-    map.removeEventListener('keydown', popupEscHandler);
-    activePopup.remove();
-    activePopup = null;
-  };
-
-    // если нажали на Esc или на enter по крестику
-  var popupEscHandler = function (event) {
-    if (event.keyCode === ESC_KEYCODE || event.keyCode === ENTER_KEYCODE) {
-      popupRemoveHandler();
-    }
-  };
-
-    //  если нажали на enter на крестике
-  var closePopupEnterHandler = function (event) {
-    if (event.target === ENTER_KEYCODE) {
-      popupRemoveHandler();
-    }
-  };
 
   // если карточки на экране нет
   if (activePopup === null) {
     var pinData = evt.currentTarget.pinData;
-    var activePin = evt.currentTarget;
+    activePin = evt.currentTarget;
     activePopup = createActiveOffer(pinData, offerTemplate);
     activePin.classList.add('map__pin--active');
 
