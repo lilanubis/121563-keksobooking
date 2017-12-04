@@ -117,56 +117,57 @@ var nearBy = createNearByArray(NUMBER_OF_OFFERS, OFFERS_INFO);
 var activePopup = null;
 
 // что происходит при открытии пина
-var pinOpen = function (evt) {
+var pinOpenHandler = function (evt) {
+
+  // что происходит при закрытии карточки
+  var popupRemoveHandler = function () {
+    activePin.classList.remove('map__pin--active');
+    popupCloseButton.removeEventListener('click', popupRemoveHandler);
+    map.removeEventListener('keydown', popupEscHandler);
+    activePopup.remove();
+    activePopup = null;
+  };
+
+    // если нажали на Esc или на enter по крестику
+  var popupEscHandler = function (event) {
+    if (event.keyCode === ESC_KEYCODE || event.keyCode === ENTER_KEYCODE) {
+      popupRemoveHandler();
+    }
+  };
+
+    //  если нажали на enter на крестике
+  var closePopupEnterHandler = function (event) {
+    if (event.target === ENTER_KEYCODE) {
+      popupRemoveHandler();
+    }
+  };
+
+  // если карточки на экране нет
   if (activePopup === null) {
     var pinData = evt.currentTarget.pinData;
-    var pin = evt.currentTarget;
+    var activePin = evt.currentTarget;
     activePopup = createActiveOffer(pinData, offerTemplate);
-    pin.classList.add('map__pin--active');
+    activePin.classList.add('map__pin--active');
 
     var popupCloseButton = activePopup.querySelector('.popup__close');
 
-    // что происходит при закрытии карточки
-    var popupRemove = function () {
-      activePopup.remove();
-      activePopup = null;
-      pin.classList.remove('map__pin--active');
-      popupCloseButton.removeEventListener('click', popupRemove);
-      map.removeEventListener('keydown', popupEscHandler);
-    };
-
-    // если нажали на Esc
-    var popupEscHandler = function (event) {
-      if (event.keyCode === ESC_KEYCODE || event.keyCode === ENTER_KEYCODE) {
-        popupRemove();
-        activePopup = createActiveOffer(pinData, offerTemplate);
-        pin.classList.add('map__pin--active');
-      }
-    };
-
-    //  если нажали на enter на крестике
-    var closePopupEnterHandler = function (event) {
-      if (event.target === ENTER_KEYCODE) {
-        popupRemove();
-      }
-    };
-
     // слушаем клики
-    popupCloseButton.addEventListener('click', popupRemove);
+    popupCloseButton.addEventListener('click', popupRemoveHandler);
     map.addEventListener('keydown', popupEscHandler);
     popupCloseButton.addEventListener('keydown', closePopupEnterHandler);
 
+  // если карточка на экране уже есть
   } else {
     activePopup.remove();
     activePopup = null;
     map.querySelector('.map__pin--active').classList.remove('map__pin--active');
-    pin = evt.currentTarget;
+    activePin = evt.currentTarget;
     pinData = evt.currentTarget.pinData;
     activePopup = createActiveOffer(pinData, offerTemplate);
 
-    pin.classList.add('map__pin--active');
+    activePin.classList.add('map__pin--active');
     popupCloseButton = activePopup.querySelector('.popup__close');
-    popupCloseButton.addEventListener('click', popupRemove);
+    popupCloseButton.addEventListener('click', popupRemoveHandler);
     map.addEventListener('keydown', popupEscHandler);
   }
 };
@@ -174,7 +175,7 @@ var pinOpen = function (evt) {
 // если нажали на Enter
 var pinEnterHandler = function (evt) {
   if (evt.target === ENTER_KEYCODE) {
-    pinOpen();
+    pinOpenHandler();
   }
 };
 
@@ -185,7 +186,7 @@ var createPin = function (pinData, template) {
   pin.style.top = pinData.location.y + 'px';
   pin.querySelector('img').src = pinData.author.avatar;
   pin.pinData = pinData;
-  pin.addEventListener('click', pinOpen);
+  pin.addEventListener('click', pinOpenHandler);
   pin.addEventListener('keydown', pinEnterHandler);
 
   return pin;
