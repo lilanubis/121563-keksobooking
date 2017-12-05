@@ -113,73 +113,65 @@ var createNearByArray = function (numberOfOffers, offersInfo) {
 // собираем массив NearBy из реальных данных
 var nearBy = createNearByArray(NUMBER_OF_OFFERS, OFFERS_INFO);
 
-// добавляем пустой попап
+// заводим переменную для активного попапа с карточкой
 var activePopup = null;
 
-// добавляем активный пин
+// заводим переменную для активного пина
 var activePin = null;
 
 // что происходит при закрытии карточки
-var popupRemoveHandler = function () {
+var closePopup = function () {
   activePin.classList.remove('map__pin--active');
   var popupCloseButton = activePopup.querySelector('.popup__close');
-  popupCloseButton.removeEventListener('click', popupRemoveHandler);
-  map.removeEventListener('keydown', popupEscHandler);
+  popupCloseButton.removeEventListener('click', popupCloseButtonClickHandler);
+  map.removeEventListener('keydown', popupCloseButtonKeydownHandler);
   activePopup.remove();
   activePopup = null;
 };
 
-  // если нажали на Esc или на enter по крестику
-var popupEscHandler = function (event) {
-  if (event.keyCode === ESC_KEYCODE || event.keyCode === ENTER_KEYCODE) {
-    popupRemoveHandler();
-  }
+// обработчик закрытия карточки
+var popupCloseButtonClickHandler = function () {
+  closePopup();
 };
 
-  //  если нажали на enter на крестике
-var closePopupEnterHandler = function (event) {
-  if (event.target === ENTER_KEYCODE) {
-    popupRemoveHandler();
+  // если нажали на Esc или на enter по крестику
+var popupCloseButtonKeydownHandler = function (event) {
+  if (event.keyCode === ESC_KEYCODE || event.keyCode === ENTER_KEYCODE) {
+    closePopup();
   }
 };
 
 // что происходит при открытии пина
-var pinOpenHandler = function (evt) {
+var pinClickHandler = function (evt) {
 
-  // если карточки на экране нет
-  if (activePopup === null) {
+  var showPopup = function () {
     var pinData = evt.currentTarget.pinData;
     activePin = evt.currentTarget;
     activePopup = createActiveOffer(pinData, offerTemplate);
     activePin.classList.add('map__pin--active');
-
     var popupCloseButton = activePopup.querySelector('.popup__close');
 
     // слушаем клики
-    popupCloseButton.addEventListener('click', popupRemoveHandler);
-    map.addEventListener('keydown', popupEscHandler);
-    popupCloseButton.addEventListener('keydown', closePopupEnterHandler);
+    popupCloseButton.addEventListener('click', closePopup);
+    map.addEventListener('keydown', popupCloseButtonClickHandler);
+    popupCloseButton.addEventListener('keydown', popupCloseButtonClickHandler);
+  };
+
+  // если карточки на экране нет
+  if (activePopup === null) {
+    showPopup();
 
   // если карточка на экране уже есть
   } else {
-    activePopup.remove();
-    activePopup = null;
-    map.querySelector('.map__pin--active').classList.remove('map__pin--active');
-    activePin = evt.currentTarget;
-    pinData = evt.currentTarget.pinData;
-    activePopup = createActiveOffer(pinData, offerTemplate);
-
-    activePin.classList.add('map__pin--active');
-    popupCloseButton = activePopup.querySelector('.popup__close');
-    popupCloseButton.addEventListener('click', popupRemoveHandler);
-    map.addEventListener('keydown', popupEscHandler);
+    closePopup();
+    showPopup();
   }
 };
 
 // если нажали на Enter
-var pinEnterHandler = function (evt) {
+var pinKeydownHandler = function (evt) {
   if (evt.target === ENTER_KEYCODE) {
-    pinOpenHandler();
+    pinClickHandler();
   }
 };
 
@@ -190,17 +182,17 @@ var createPin = function (pinData, template) {
   pin.style.top = pinData.location.y + 'px';
   pin.querySelector('img').src = pinData.author.avatar;
   pin.pinData = pinData;
-  pin.addEventListener('click', pinOpenHandler);
-  pin.addEventListener('keydown', pinEnterHandler);
+  pin.addEventListener('click', pinClickHandler);
+  pin.addEventListener('keydown', pinKeydownHandler);
 
   return pin;
 };
 
 // собираем все пины из реальных данных
-var createAllPins = function () {
+var createAllPins = function (array) {
   var fragmentPin = document.createDocumentFragment();
-  for (var l = 0; l < nearBy.length; l++) {
-    fragmentPin.appendChild(createPin(nearBy[l], pinTemplate));
+  for (var l = 0; l < array.length; l++) {
+    fragmentPin.appendChild(createPin(array[l], pinTemplate));
   }
   mapPins.appendChild(fragmentPin);
 };
@@ -238,7 +230,7 @@ var createActiveOffer = function (offer, template) {
 // создаем события для шелчка по главному Пину
 var mainPinMouseupHandler = function () {
   mainPin.removeEventListener('mouseup', mainPinMouseupHandler);
-  createAllPins();
+  createAllPins(nearBy);
   document.querySelector('.map').classList.remove('map--faded');
   noticeForm.classList.remove('notice__form--disabled');
   for (var j = 0; j < fieldsets.length; j++) {
