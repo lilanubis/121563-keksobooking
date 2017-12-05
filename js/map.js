@@ -32,6 +32,13 @@ var LOCATION_MIN_MAX = {
   }
 };
 
+var MIN_PRICES_PER_TYPE = {
+  bungalo: 0,
+  flat: 1000,
+  house: 5000,
+  palace: 10000
+};
+
 // константы для кнопок на клаве
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
@@ -44,6 +51,12 @@ var fieldsets = document.querySelectorAll('fieldset');
 var mapPins = document.querySelector('.map__pins');
 var pinTemplate = document.querySelector('template').content.querySelector('.map__pin');
 var offerTemplate = document.querySelector('template').content.querySelector('.map__card');
+var timeInInput = document.querySelector('#timein');
+var timeOutInput = document.querySelector('#timeout');
+var accomodationTypeSelect = document.querySelector('#type');
+var accomodationPriceInput = document.querySelector('#price');
+var roomNumberSelect = document.querySelector('#room_number');
+var capacitySelect = document.querySelector('#capacity');
 
 // сделаем все поля формы disabled изначально
 for (var i = 0; i < fieldsets.length; i++) {
@@ -240,3 +253,67 @@ var mainPinMouseupHandler = function () {
 
 // щелкаем по главному пину
 mainPin.addEventListener('mouseup', mainPinMouseupHandler);
+
+// форма доступна для заполнения
+
+// синхронизируем время заезда и выезда
+// обработчик события на инпут времени въезда
+var timeInInputHandler = function () {
+  timeOutInput.value = timeInInput.value;
+};
+// обработчик события на инпут времени въезда
+var timeOutInputHandler = function () {
+  timeInInput.value = timeOutInput.value;
+};
+
+// слушаем изменения в инпуте времени въезда
+timeInInput.addEventListener('input', timeInInputHandler);
+
+// слушаем изменения в инпуте времени выезда
+timeOutInput.addEventListener('input', timeOutInputHandler);
+
+// синхронизируем тип жилья с ценой
+// обработчик события на селект с типом жилья
+var accomodationTypeSelectSelectHandler = function () {
+  if (accomodationTypeSelect.value === 'bungalo') {
+    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.bungalo);
+  } else if (accomodationTypeSelect.value === 'flat') {
+    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.flat);
+  } else if (accomodationTypeSelect.value === 'house') {
+    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.house);
+  } else {
+    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.palace);
+  }
+};
+
+// слушаем изменения в селекте жилья
+accomodationTypeSelect.addEventListener('input', accomodationTypeSelectSelectHandler);
+
+// синхронизируем количество комнат с количеством гостей
+// обработчик события на селект с количеством комнат
+var roomNumberSelectSelectHadler = function () {
+  if (roomNumberSelect.value === '1') {
+    capacitySelect.options[0].disabled = true;
+    capacitySelect.options[1].disabled = true;
+    capacitySelect.options[2].disabled = false;
+    capacitySelect.options[3].disabled = true;
+  } else if (roomNumberSelect.value === '2') {
+    capacitySelect.options[0].disabled = false;
+    capacitySelect.options[1].disabled = false;
+    capacitySelect.options[2].disabled = true;
+    capacitySelect.options[3].disabled = true;
+  } else if (roomNumberSelect.value === '3') {
+    capacitySelect.options[0].disabled = false;
+    capacitySelect.options[1].disabled = false;
+    capacitySelect.options[2].disabled = false;
+    capacitySelect.options[3].disabled = true;
+  } else {
+    capacitySelect.options[0].disabled = true;
+    capacitySelect.options[1].disabled = true;
+    capacitySelect.options[2].disabled = true;
+    capacitySelect.options[3].disabled = false;
+  }
+};
+
+// слушаем измнения в селекте кол-ва комнат
+roomNumberSelect.addEventListener('input', roomNumberSelectSelectHadler);
