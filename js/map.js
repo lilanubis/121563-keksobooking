@@ -39,6 +39,13 @@ var MIN_PRICES_PER_TYPE = {
   palace: 10000
 };
 
+var ROOM_CAPACITY = {
+  '1': ['1'],
+  '2': ['1', '2'],
+  '3': ['1', '2', '3'],
+  '100': ['0']
+};
+
 // константы для кнопок на клаве
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
@@ -291,50 +298,48 @@ accomodationTypeSelect.addEventListener('input', accomodationTypeSelectHandler);
 
 // синхронизируем количество комнат с количеством гостей
 // обработчик события на селект с количеством комнат
-var roomNumberSelectSelectHadler = function () {
-  if (roomNumberSelect.value === '1') {
-    capacitySelect.options[2].selected = true;
-    capacitySelect.options[0].disabled = true;
-    capacitySelect.options[1].disabled = true;
-    capacitySelect.options[2].disabled = false;
-    capacitySelect.options[3].disabled = true;
-  } else if (roomNumberSelect.value === '2') {
-    capacitySelect.options[2].selected = true;
-    capacitySelect.options[0].disabled = true;
-    capacitySelect.options[1].disabled = false;
-    capacitySelect.options[2].disabled = false;
-    capacitySelect.options[3].disabled = true;
-  } else if (roomNumberSelect.value === '3') {
-    capacitySelect.options[2].selected = true;
-    capacitySelect.options[0].disabled = false;
-    capacitySelect.options[1].disabled = false;
-    capacitySelect.options[2].disabled = false;
-    capacitySelect.options[3].disabled = true;
-  } else {
-    capacitySelect.options[3].selected = true;
-    capacitySelect.options[0].disabled = true;
-    capacitySelect.options[1].disabled = true;
-    capacitySelect.options[2].disabled = true;
-    capacitySelect.options[3].disabled = false;
+var roomNumberSelectHadler = function (evt) {
+  var roomCount = evt.target.value;
+  var options = capacitySelect.options;
+  var hasSelected = false;
+
+  for (var j = 0; i < options.length; j++) {
+    var currentOption = options[j]; // тут будет число
+    var currentOptionValue = currentOption.value; // тут будет число (вместимость)
+    var suitableCapacity = ROOM_CAPACITY[roomCount]; // массив со значениями (value) подходящей вместительности
+    var isDisabled = suitableCapacity.indexOf(currentOptionValue) === -1; // если в массиве нет значения текущей опции, то статус опции disabled = true
+
+    currentOption.selected = false; // для начала делаем пункт не выбраным
+    currentOption.disabled = isDisabled; // применяем к атрибуту disabled
+    if (!isDisabled && !hasSelected) { // если не disabled  и еще нет выбранного нами вручную пункта
+      currentOption.selected = true;
+      hasSelected = true; // назначаем значение true, что бы больше не заходить в это условие(selected в списке должен быть только один)
+    }
   }
 };
 
-// слушаем измнения в селекте кол-ва комнат
-roomNumberSelect.addEventListener('input', roomNumberSelectSelectHadler);
+roomNumberSelect.addEventListener('input', roomNumberSelectHadler);
 
-// проверяем введенные данные
-// обработчик события на invalid
-var noticeFormInvalidHandler = function (evt) {
-  var invalidOption = evt.target;
-  invalidOption.style.border = '1px solid red';
+//
+
+var submit = noticeForm.querySelector('.form__submit');
+var inputs = noticeForm.querySelectorAll('input');
+
+var checkValidity = function () {
+  for (i = 0; i < inputs.length; i++) {
+    var input = inputs[i];
+    if (input.checkValidity() === false) {
+      input.style.borderColor = 'red';
+    } else {
+      input.style.borderColor = 'black';
+    }
+  }
 };
 
-// обработчик события на valid
-var noticeFormValidHandler = function (evt) {
-  var validOption = evt.target;
-  validOption.style.border = 'none';
+var onSubmitClick = function (evt) {
+  evt.preventDefault();
+  checkValidity();
+  noticeForm.submit();
 };
 
-// слушаем события на форме
-noticeForm.addEventListener('invalid', noticeFormInvalidHandler, true);
-noticeForm.addEventListener('valid', noticeFormValidHandler, true);
+submit.addEventListener('click', onSubmitClick);
