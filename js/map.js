@@ -274,7 +274,7 @@ timeOutInput.addEventListener('input', timeOutInputHandler);
 
 // синхронизируем тип жилья с ценой
 // обработчик события на селект с типом жилья
-var accomodationTypeSelectSelectHandler = function () {
+var accomodationTypeSelectHandler = function () {
   if (accomodationTypeSelect.value === 'bungalo') {
     accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.bungalo);
   } else if (accomodationTypeSelect.value === 'flat') {
@@ -287,27 +287,31 @@ var accomodationTypeSelectSelectHandler = function () {
 };
 
 // слушаем изменения в селекте жилья
-accomodationTypeSelect.addEventListener('input', accomodationTypeSelectSelectHandler);
+accomodationTypeSelect.addEventListener('input', accomodationTypeSelectHandler);
 
 // синхронизируем количество комнат с количеством гостей
 // обработчик события на селект с количеством комнат
 var roomNumberSelectSelectHadler = function () {
   if (roomNumberSelect.value === '1') {
+    capacitySelect.options[2].selected = true;
     capacitySelect.options[0].disabled = true;
     capacitySelect.options[1].disabled = true;
     capacitySelect.options[2].disabled = false;
     capacitySelect.options[3].disabled = true;
   } else if (roomNumberSelect.value === '2') {
-    capacitySelect.options[0].disabled = false;
+    capacitySelect.options[2].selected = true;
+    capacitySelect.options[0].disabled = true;
     capacitySelect.options[1].disabled = false;
-    capacitySelect.options[2].disabled = true;
+    capacitySelect.options[2].disabled = false;
     capacitySelect.options[3].disabled = true;
   } else if (roomNumberSelect.value === '3') {
+    capacitySelect.options[2].selected = true;
     capacitySelect.options[0].disabled = false;
     capacitySelect.options[1].disabled = false;
     capacitySelect.options[2].disabled = false;
     capacitySelect.options[3].disabled = true;
   } else {
+    capacitySelect.options[3].selected = true;
     capacitySelect.options[0].disabled = true;
     capacitySelect.options[1].disabled = true;
     capacitySelect.options[2].disabled = true;
@@ -317,3 +321,20 @@ var roomNumberSelectSelectHadler = function () {
 
 // слушаем измнения в селекте кол-ва комнат
 roomNumberSelect.addEventListener('input', roomNumberSelectSelectHadler);
+
+// проверяем введенные данные
+// обработчик события на invalid
+var noticeFormInvalidHandler = function (evt) {
+  var invalidOption = evt.target;
+  invalidOption.style.border = '1px solid red';
+};
+
+// обработчик события на valid
+var noticeFormValidHandler = function (evt) {
+  var validOption = evt.target;
+  validOption.style.border = 'none';
+};
+
+// слушаем события на форме
+noticeForm.addEventListener('invalid', noticeFormInvalidHandler, true);
+noticeForm.addEventListener('valid', noticeFormValidHandler, true);
