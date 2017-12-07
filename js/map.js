@@ -252,6 +252,7 @@ var mainPinMouseupHandler = function () {
   mainPin.removeEventListener('mouseup', mainPinMouseupHandler);
   createAllPins(nearBy);
   document.querySelector('.map').classList.remove('map--faded');
+  setMinMaxPriceAttribute();
   noticeForm.classList.remove('notice__form--disabled');
   for (var j = 0; j < fieldsets.length; j++) {
     fieldsets[j].removeAttribute('disabled', 'disabled');
@@ -280,8 +281,9 @@ timeInInput.addEventListener('input', timeInInputHandler);
 timeOutInput.addEventListener('input', timeOutInputHandler);
 
 // синхронизируем тип жилья с ценой
-// обработчик события на селект с типом жилья
-var accomodationTypeSelectHandler = function () {
+
+// функция для обработки min-max жилья
+var setMinMaxPriceAttribute = function () {
   if (accomodationTypeSelect.value === 'bungalo') {
     accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.bungalo);
   } else if (accomodationTypeSelect.value === 'flat') {
@@ -291,6 +293,11 @@ var accomodationTypeSelectHandler = function () {
   } else {
     accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.palace);
   }
+};
+
+// обработчик события на селект с типом жилья
+var accomodationTypeSelectHandler = function () {
+  setMinMaxPriceAttribute();
 };
 
 // слушаем изменения в селекте жилья
@@ -329,17 +336,16 @@ var checkValidity = function () {
   for (i = 0; i < inputs.length; i++) {
     var input = inputs[i];
     if (input.checkValidity() === false) {
-      input.style.borderColor = 'red';
+      input.style.borderColor = '#ff6d51';
+      onSubmitClick.evt.preventDefault();
     } else {
-      input.style.borderColor = 'black';
+      input.style.borderColor = '#03f8c1';
     }
   }
 };
 
-var onSubmitClick = function (evt) {
-  evt.preventDefault();
+var onSubmitClick = function () {
   checkValidity();
-  noticeForm.submit();
 };
 
 submit.addEventListener('click', onSubmitClick);
