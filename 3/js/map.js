@@ -32,20 +32,6 @@ var LOCATION_MIN_MAX = {
   }
 };
 
-var MIN_PRICES_PER_TYPE = {
-  bungalo: 0,
-  flat: 1000,
-  house: 5000,
-  palace: 10000
-};
-
-var ROOM_CAPACITY = {
-  '1': ['1'],
-  '2': ['1', '2'],
-  '3': ['1', '2', '3'],
-  '100': ['0']
-};
-
 // константы для кнопок на клаве
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
@@ -58,12 +44,6 @@ var fieldsets = document.querySelectorAll('fieldset');
 var mapPins = document.querySelector('.map__pins');
 var pinTemplate = document.querySelector('template').content.querySelector('.map__pin');
 var offerTemplate = document.querySelector('template').content.querySelector('.map__card');
-var timeInInput = document.querySelector('#timein');
-var timeOutInput = document.querySelector('#timeout');
-var accomodationTypeSelect = document.querySelector('#type');
-var accomodationPriceInput = document.querySelector('#price');
-var roomNumberSelect = document.querySelector('#room_number');
-var capacitySelect = document.querySelector('#capacity');
 
 // сделаем все поля формы disabled изначально
 for (var i = 0; i < fieldsets.length; i++) {
@@ -133,65 +113,68 @@ var createNearByArray = function (numberOfOffers, offersInfo) {
 // собираем массив NearBy из реальных данных
 var nearBy = createNearByArray(NUMBER_OF_OFFERS, OFFERS_INFO);
 
-// заводим переменную для активного попапа с карточкой
+// добавляем пустой попап
 var activePopup = null;
 
-// заводим переменную для активного пина
-var activePin = null;
-
-// что происходит при закрытии карточки
-var closePopup = function () {
-  activePin.classList.remove('map__pin--active');
-  var popupCloseButton = activePopup.querySelector('.popup__close');
-  popupCloseButton.removeEventListener('click', popupCloseButtonClickHandler);
-  map.removeEventListener('keydown', popupCloseButtonKeydownHandler);
-  activePopup.remove();
-  activePopup = null;
-};
-
-// обработчик закрытия карточки
-var popupCloseButtonClickHandler = function () {
-  closePopup();
-};
-
-  // если нажали на Esc или на enter по крестику
-var popupCloseButtonKeydownHandler = function (event) {
-  if (event.keyCode === ESC_KEYCODE || event.keyCode === ENTER_KEYCODE) {
-    closePopup();
-  }
-};
-
 // что происходит при открытии пина
-var pinClickHandler = function (evt) {
-
-  var showPopup = function () {
+var pinOpen = function (evt) {
+  if (activePopup === null) {
     var pinData = evt.currentTarget.pinData;
-    activePin = evt.currentTarget;
+    var pin = evt.currentTarget;
     activePopup = createActiveOffer(pinData, offerTemplate);
-    activePin.classList.add('map__pin--active');
+    pin.classList.add('map__pin--active');
+
     var popupCloseButton = activePopup.querySelector('.popup__close');
 
+    // что происходит при закрытии карточки
+    var popupRemove = function () {
+      activePopup.remove();
+      activePopup = null;
+      pin.classList.remove('map__pin--active');
+      popupCloseButton.removeEventListener('click', popupRemove);
+      map.removeEventListener('keydown', popupEscHandler);
+    };
+
+    // если нажали на Esc
+    var popupEscHandler = function (event) {
+      if (event.keyCode === ESC_KEYCODE || event.keyCode === ENTER_KEYCODE) {
+        popupRemove();
+        activePopup = createActiveOffer(pinData, offerTemplate);
+        pin.classList.add('map__pin--active');
+      }
+    };
+
+    //  если нажали на enter на крестике
+    var closePopupEnterHandler = function (event) {
+      if (event.target === ENTER_KEYCODE) {
+        popupRemove();
+      }
+    };
+
     // слушаем клики
-    popupCloseButton.addEventListener('click', closePopup);
-    map.addEventListener('keydown', popupCloseButtonClickHandler);
-    popupCloseButton.addEventListener('keydown', popupCloseButtonClickHandler);
-  };
+    popupCloseButton.addEventListener('click', popupRemove);
+    map.addEventListener('keydown', popupEscHandler);
+    popupCloseButton.addEventListener('keydown', closePopupEnterHandler);
 
-  // если карточки на экране нет
-  if (activePopup === null) {
-    showPopup();
-
-  // если карточка на экране уже есть
   } else {
-    closePopup();
-    showPopup();
+    activePopup.remove();
+    activePopup = null;
+    map.querySelector('.map__pin--active').classList.remove('map__pin--active');
+    pin = evt.currentTarget;
+    pinData = evt.currentTarget.pinData;
+    activePopup = createActiveOffer(pinData, offerTemplate);
+
+    pin.classList.add('map__pin--active');
+    popupCloseButton = activePopup.querySelector('.popup__close');
+    popupCloseButton.addEventListener('click', popupRemove);
+    map.addEventListener('keydown', popupEscHandler);
   }
 };
 
 // если нажали на Enter
-var pinKeydownHandler = function (evt) {
+var pinEnterHandler = function (evt) {
   if (evt.target === ENTER_KEYCODE) {
-    pinClickHandler();
+    pinOpen();
   }
 };
 
@@ -202,17 +185,17 @@ var createPin = function (pinData, template) {
   pin.style.top = pinData.location.y + 'px';
   pin.querySelector('img').src = pinData.author.avatar;
   pin.pinData = pinData;
-  pin.addEventListener('click', pinClickHandler);
-  pin.addEventListener('keydown', pinKeydownHandler);
+  pin.addEventListener('click', pinOpen);
+  pin.addEventListener('keydown', pinEnterHandler);
 
   return pin;
 };
 
 // собираем все пины из реальных данных
-var createAllPins = function (array) {
+var createAllPins = function () {
   var fragmentPin = document.createDocumentFragment();
-  for (var l = 0; l < array.length; l++) {
-    fragmentPin.appendChild(createPin(array[l], pinTemplate));
+  for (var l = 0; l < nearBy.length; l++) {
+    fragmentPin.appendChild(createPin(nearBy[l], pinTemplate));
   }
   mapPins.appendChild(fragmentPin);
 };
@@ -250,9 +233,8 @@ var createActiveOffer = function (offer, template) {
 // создаем события для шелчка по главному Пину
 var mainPinMouseupHandler = function () {
   mainPin.removeEventListener('mouseup', mainPinMouseupHandler);
-  createAllPins(nearBy);
+  createAllPins();
   document.querySelector('.map').classList.remove('map--faded');
-  setMinMaxPriceAttribute();
   noticeForm.classList.remove('notice__form--disabled');
   for (var j = 0; j < fieldsets.length; j++) {
     fieldsets[j].removeAttribute('disabled', 'disabled');
@@ -261,91 +243,3 @@ var mainPinMouseupHandler = function () {
 
 // щелкаем по главному пину
 mainPin.addEventListener('mouseup', mainPinMouseupHandler);
-
-// форма доступна для заполнения
-
-// синхронизируем время заезда и выезда
-// обработчик события на инпут времени въезда
-var timeInInputHandler = function () {
-  timeOutInput.value = timeInInput.value;
-};
-// обработчик события на инпут времени въезда
-var timeOutInputHandler = function () {
-  timeInInput.value = timeOutInput.value;
-};
-
-// слушаем изменения в инпуте времени въезда
-timeInInput.addEventListener('input', timeInInputHandler);
-
-// слушаем изменения в инпуте времени выезда
-timeOutInput.addEventListener('input', timeOutInputHandler);
-
-// синхронизируем тип жилья с ценой
-
-// функция для обработки min-max жилья
-var setMinMaxPriceAttribute = function () {
-  if (accomodationTypeSelect.value === 'bungalo') {
-    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.bungalo);
-  } else if (accomodationTypeSelect.value === 'flat') {
-    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.flat);
-  } else if (accomodationTypeSelect.value === 'house') {
-    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.house);
-  } else {
-    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.palace);
-  }
-};
-
-// обработчик события на селект с типом жилья
-var accomodationTypeSelectHandler = function () {
-  setMinMaxPriceAttribute();
-};
-
-// слушаем изменения в селекте жилья
-accomodationTypeSelect.addEventListener('input', accomodationTypeSelectHandler);
-
-// синхронизируем количество комнат с количеством гостей
-// обработчик события на селект с количеством комнат
-var roomNumberSelectHadler = function (evt) {
-  var roomCount = evt.target.value;
-  var options = capacitySelect.options;
-  var hasSelected = false;
-
-  for (var j = 0; i < options.length; j++) {
-    var currentOption = options[j]; // тут будет число
-    var currentOptionValue = currentOption.value; // тут будет число (вместимость)
-    var suitableCapacity = ROOM_CAPACITY[roomCount]; // массив со значениями (value) подходящей вместительности
-    var isDisabled = suitableCapacity.indexOf(currentOptionValue) === -1; // если в массиве нет значения текущей опции, то статус опции disabled = true
-
-    currentOption.selected = false; // для начала делаем пункт не выбраным
-    currentOption.disabled = isDisabled; // применяем к атрибуту disabled
-    if (!isDisabled && !hasSelected) { // если не disabled  и еще нет выбранного нами вручную пункта
-      currentOption.selected = true;
-      hasSelected = true; // назначаем значение true, что бы больше не заходить в это условие(selected в списке должен быть только один)
-    }
-  }
-};
-
-roomNumberSelect.addEventListener('input', roomNumberSelectHadler);
-
-//
-
-var submit = noticeForm.querySelector('.form__submit');
-var inputs = noticeForm.querySelectorAll('input');
-
-var checkValidity = function () {
-  for (i = 0; i < inputs.length; i++) {
-    var input = inputs[i];
-    if (input.checkValidity() === false) {
-      input.style.borderColor = '#ff6d51';
-      onSubmitClick.evt.preventDefault();
-    } else {
-      input.style.borderColor = '#03f8c1';
-    }
-  }
-};
-
-var onSubmitClick = function () {
-  checkValidity();
-};
-
-submit.addEventListener('click', onSubmitClick);
