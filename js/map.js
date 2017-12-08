@@ -32,6 +32,20 @@ var LOCATION_MIN_MAX = {
   }
 };
 
+var MIN_PRICES_PER_TYPE = {
+  bungalo: 0,
+  flat: 1000,
+  house: 5000,
+  palace: 10000
+};
+
+var ROOM_CAPACITY = {
+  '1': ['1'],
+  '2': ['1', '2'],
+  '3': ['1', '2', '3'],
+  '100': ['0']
+};
+
 // константы для кнопок на клаве
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
@@ -44,6 +58,12 @@ var fieldsets = document.querySelectorAll('fieldset');
 var mapPins = document.querySelector('.map__pins');
 var pinTemplate = document.querySelector('template').content.querySelector('.map__pin');
 var offerTemplate = document.querySelector('template').content.querySelector('.map__card');
+var timeInInput = document.querySelector('#timein');
+var timeOutInput = document.querySelector('#timeout');
+var accomodationTypeSelect = document.querySelector('#type');
+var accomodationPriceInput = document.querySelector('#price');
+var roomNumberSelect = document.querySelector('#room_number');
+var capacitySelect = document.querySelector('#capacity');
 
 // сделаем все поля формы disabled изначально
 for (var i = 0; i < fieldsets.length; i++) {
@@ -232,6 +252,7 @@ var mainPinMouseupHandler = function () {
   mainPin.removeEventListener('mouseup', mainPinMouseupHandler);
   createAllPins(nearBy);
   document.querySelector('.map').classList.remove('map--faded');
+  setMinMaxPriceAttribute();
   noticeForm.classList.remove('notice__form--disabled');
   for (var j = 0; j < fieldsets.length; j++) {
     fieldsets[j].removeAttribute('disabled', 'disabled');
@@ -240,3 +261,91 @@ var mainPinMouseupHandler = function () {
 
 // щелкаем по главному пину
 mainPin.addEventListener('mouseup', mainPinMouseupHandler);
+
+// форма доступна для заполнения
+
+// синхронизируем время заезда и выезда
+// обработчик события на инпут времени въезда
+var timeInInputHandler = function () {
+  timeOutInput.value = timeInInput.value;
+};
+// обработчик события на инпут времени въезда
+var timeOutInputHandler = function () {
+  timeInInput.value = timeOutInput.value;
+};
+
+// слушаем изменения в инпуте времени въезда
+timeInInput.addEventListener('input', timeInInputHandler);
+
+// слушаем изменения в инпуте времени выезда
+timeOutInput.addEventListener('input', timeOutInputHandler);
+
+// синхронизируем тип жилья с ценой
+
+// функция для обработки min-max жилья
+var setMinMaxPriceAttribute = function () {
+  if (accomodationTypeSelect.value === 'bungalo') {
+    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.bungalo);
+  } else if (accomodationTypeSelect.value === 'flat') {
+    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.flat);
+  } else if (accomodationTypeSelect.value === 'house') {
+    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.house);
+  } else {
+    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.palace);
+  }
+};
+
+// обработчик события на селект с типом жилья
+var accomodationTypeSelectHandler = function () {
+  setMinMaxPriceAttribute();
+};
+
+// слушаем изменения в селекте жилья
+accomodationTypeSelect.addEventListener('input', accomodationTypeSelectHandler);
+
+// синхронизируем количество комнат с количеством гостей
+// обработчик события на селект с количеством комнат
+var roomNumberSelectHadler = function (evt) {
+  var roomCount = evt.target.value;
+  var options = capacitySelect.options;
+  var hasSelected = false;
+
+  for (var j = 0; i < options.length; j++) {
+    var currentOption = options[j]; // тут будет число
+    var currentOptionValue = currentOption.value; // тут будет число (вместимость)
+    var suitableCapacity = ROOM_CAPACITY[roomCount]; // массив со значениями (value) подходящей вместительности
+    var isDisabled = suitableCapacity.indexOf(currentOptionValue) === -1; // если в массиве нет значения текущей опции, то статус опции disabled = true
+
+    currentOption.selected = false; // для начала делаем пункт не выбраным
+    currentOption.disabled = isDisabled; // применяем к атрибуту disabled
+    if (!isDisabled && !hasSelected) { // если не disabled  и еще нет выбранного нами вручную пункта
+      currentOption.selected = true;
+      hasSelected = true; // назначаем значение true, что бы больше не заходить в это условие(selected в списке должен быть только один)
+    }
+  }
+};
+
+roomNumberSelect.addEventListener('input', roomNumberSelectHadler);
+
+//
+
+var submit = noticeForm.querySelector('.form__submit');
+var inputs = noticeForm.querySelectorAll('input');
+
+var checkValidity = function () {
+  for (i = 0; i < inputs.length; i++) {
+    var input = inputs[i];
+    if (input.checkValidity() === false) {
+      input.style.borderColor = '#ff6d51';
+      onSubmitClick.evt.preventDefault();
+    } else {
+      input.style.borderColor = '#03f8c1';
+    }
+  }
+};
+
+var onSubmitClick = function () {
+  checkValidity();
+};
+
+submit.addEventListener('click', onSubmitClick);
