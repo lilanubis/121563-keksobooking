@@ -18,6 +18,19 @@
     map.removeEventListener('keydown', popupCloseButtonKeydownHandler);
     activePopup.remove();
     activePopup = null;
+    window.popupCloseButton = activePopup.querySelector('.popup__close');
+    window.popupCloseButton.removeEventListener('click', popupCloseButtonClickHandler);
+    map.removeEventListener('keydown', popupCloseButtonKeydownHandler);
+    activePopup.remove();
+    activePopup = null;
+  };
+
+  var showPopup = function (evt) {
+    var pinData = evt.currentTarget.pinData;
+    var activePin = evt.currentTarget;
+    createActiveOffer(pinData, document.querySelector('template'));
+    activePin.classList.add('map__pin--active');
+    map.addEventListener('keydown', window.card.popupCloseButtonKeydownHandler);
   };
 
   // обработчик закрытия карточки
@@ -34,36 +47,44 @@
 
   // собираем шаблон карточки с предложением
   var createOffer = function (offerData, template) {
-    var getOffer = template.cloneNode(true);
+    var offerTemplate = template.cloneNode(true).content;
     var offer = offerData.offer;
-    getOffer.querySelector('h3').textContent = offer.title;
-    getOffer.querySelector('small').textContent = offer.address;
-    getOffer.querySelector('.popup__price').textContent = offer.price + '₽/ночь';
-    getOffer.querySelector('h4').textContent = getKeyValue(window.data.OFFERS_INFO.type, offer.type);
-    getOffer.querySelector('p:nth-of-type(3)').textContent = offer.rooms + ' комнаты для ' + offer.guests + ' гостей';
-    getOffer.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + offer.checkin + ', выезд до ' + offer.checkout;
-    getOffer.querySelector('p:nth-of-type(5)').textContent = offer.description;
-    getOffer.querySelector('img').src = offerData.author.avatar;
-    getOffer.querySelector('.popup__features').innerHTML = '';
+    offerTemplate.querySelector('h3').textContent = offer.title;
+    offerTemplate.querySelector('small').textContent = offer.address;
+    offerTemplate.querySelector('.popup__price').textContent = offer.price + '₽/ночь';
+    offerTemplate.querySelector('h4').textContent = getKeyValue(window.data.OFFERS_INFO.type, offer.type);
+    offerTemplate.querySelector('p:nth-of-type(3)').textContent = offer.rooms + ' комнаты для ' + offer.guests + ' гостей';
+    offerTemplate.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + offer.checkin + ', выезд до ' + offer.checkout;
+    offerTemplate.querySelector('p:nth-of-type(5)').textContent = offer.description;
+    offerTemplate.querySelector('img').src = offerData.author.avatar;
+    offerTemplate.querySelector('.popup__features').innerHTML = '';
 
     var featuresHtmlString = '';
     for (var j = 0; j < offerData.offer.features.length; j++) {
       featuresHtmlString += '<li class="feature feature--' + offerData.offer.features[j] + '"></li>';
     }
-    getOffer.querySelector('.popup__features').insertAdjacentHTML('afterbegin', featuresHtmlString);
-    return getOffer;
+    offerTemplate.querySelector('.popup__features').insertAdjacentHTML('afterbegin', featuresHtmlString);
+    return offerTemplate;
   };
 
   // cоздаем шаблон одной активной карточки
   var createActiveOffer = function (offer, template) {
     var offerElement = createOffer(offer, template);
     return map.insertBefore(offerElement, map.children[1]);
+
+    // слушаем клики
+    var popupCloseButton = document.querySelector('.popup__close');
+    popupCloseButton.addEventListener('click', window.card.closePopup);
+    popupCloseButton.addEventListener('keydown', window.card.popupCloseButtonClickHandler);
   };
 
   window.card = {
-    activePopup: activePopup,
     createActiveOffer: createActiveOffer,
     closePopup: closePopup,
     popupCloseButtonClickHandler: popupCloseButtonClickHandler
+  };
+
+  window.card = {
+    showPopup: showPopup
   };
 })();
