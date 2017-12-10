@@ -1,74 +1,11 @@
 'use strict';
 
-// константы для создания объекта nearBy
-var NUMBER_OF_OFFERS = 8;
-var OFFERS_INFO = {
-  title: ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'],
-  type: {
-    flat: 'Квартира',
-    bungalo: 'Бунгало',
-    house: 'Дом'
-  },
-  checkinout: ['12:00', '13:00', '14:00'],
-  features: ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner']
-};
-var PIN_HEIGHT = 44;
-var PRICE_MIN_MAX = {
-  min: 1000,
-  max: 1000000
-};
-var ROOMS_GUESTS_MIN_MAX = {
-  min: 1,
-  max: 5
-};
-var LOCATION_MIN_MAX = {
-  x: {
-    min: 300,
-    max: 900
-  },
-  y: {
-    min: 100,
-    max: 500
-  }
-};
-
-var MIN_PRICES_PER_TYPE = {
-  bungalo: 0,
-  flat: 1000,
-  house: 5000,
-  palace: 10000
-};
-
-var ROOM_CAPACITY = {
-  '1': ['1'],
-  '2': ['1', '2'],
-  '3': ['1', '2', '3'],
-  '100': ['0']
-};
-
-// константы для кнопок на клаве
-var ESC_KEYCODE = 27;
-var ENTER_KEYCODE = 13;
-
 // переменные для объектов, которые есть в Доме изначально
 var map = document.querySelector('.map');
 var mainPin = map.querySelector('.map__pin--main');
-var noticeForm = document.querySelector('.notice__form');
-var fieldsets = document.querySelectorAll('fieldset');
 var mapPins = document.querySelector('.map__pins');
 var pinTemplate = document.querySelector('template').content.querySelector('.map__pin');
 var offerTemplate = document.querySelector('template').content.querySelector('.map__card');
-var timeInInput = document.querySelector('#timein');
-var timeOutInput = document.querySelector('#timeout');
-var accomodationTypeSelect = document.querySelector('#type');
-var accomodationPriceInput = document.querySelector('#price');
-var roomNumberSelect = document.querySelector('#room_number');
-var capacitySelect = document.querySelector('#capacity');
-
-// сделаем все поля формы disabled изначально
-for (var i = 0; i < fieldsets.length; i++) {
-  fieldsets[i].setAttribute('disabled', 'disabled');
-}
 
 // вспомогательные функции
 // выбрать случайное число от.. до..
@@ -97,13 +34,13 @@ var getKeyValue = function (obj, key) {
   return obj[key];
 };
 
-// собираем шаблон массива NearBy
-var createNearByArray = function (numberOfOffers, offersInfo) {
-  var nearBy = [];
+// собираем шаблон массива allOffersArray
+var createallOffersArrayArray = function (numberOfOffers, offersInfo) {
+  var allOffersArray = [];
   for (var k = 0; k < numberOfOffers; k++) {
-    var x = getRandomNumber(LOCATION_MIN_MAX.x.min, LOCATION_MIN_MAX.x.max);
-    var y = getRandomNumber(LOCATION_MIN_MAX.y.min, LOCATION_MIN_MAX.y.max) - PIN_HEIGHT;
-    nearBy[k] =
+    var x = getRandomNumber(window.data.LOCATION_MIN_MAX.x.min, window.data.LOCATION_MIN_MAX.x.max);
+    var y = getRandomNumber(window.data.LOCATION_MIN_MAX.y.min, window.data.LOCATION_MIN_MAX.y.max) - window.data.PIN_HEIGHT;
+    allOffersArray[k] =
       {
         author: {
           avatar: 'img/avatars/user0' + (k + 1) + '.png'
@@ -111,10 +48,10 @@ var createNearByArray = function (numberOfOffers, offersInfo) {
         offer: {
           title: getRandomArrayItem(offersInfo.title),
           address: x + ', ' + y,
-          price: getRandomNumber(PRICE_MIN_MAX.min, PRICE_MIN_MAX.max),
+          price: getRandomNumber(window.data.PRICE_MIN_MAX.min, window.data.PRICE_MIN_MAX.max),
           type: getRandomArrayItem(Object.keys(offersInfo.type)),
-          rooms: getRandomNumber(ROOMS_GUESTS_MIN_MAX.min, ROOMS_GUESTS_MIN_MAX.max),
-          guests: getRandomNumber(ROOMS_GUESTS_MIN_MAX.min, ROOMS_GUESTS_MIN_MAX.max),
+          rooms: getRandomNumber(window.data.ROOMS_GUESTS_MIN_MAX.min, window.data.ROOMS_GUESTS_MIN_MAX.max),
+          guests: getRandomNumber(window.data.ROOMS_GUESTS_MIN_MAX.min, window.data.ROOMS_GUESTS_MIN_MAX.max),
           checkin: getRandomArrayItem(offersInfo.checkinout),
           checkout: getRandomArrayItem(offersInfo.checkinout),
           features: getRandomElementsArray(offersInfo.features),
@@ -127,11 +64,11 @@ var createNearByArray = function (numberOfOffers, offersInfo) {
         }
       };
   }
-  return nearBy;
+  return allOffersArray;
 };
 
-// собираем массив NearBy из реальных данных
-var nearBy = createNearByArray(NUMBER_OF_OFFERS, OFFERS_INFO);
+// собираем массив allOffersArray из реальных данных
+var allOffersArray = createallOffersArrayArray(window.data.NUMBER_OF_OFFERS, window.data.OFFERS_INFO);
 
 // заводим переменную для активного попапа с карточкой
 var activePopup = null;
@@ -156,7 +93,7 @@ var popupCloseButtonClickHandler = function () {
 
   // если нажали на Esc или на enter по крестику
 var popupCloseButtonKeydownHandler = function (event) {
-  if (event.keyCode === ESC_KEYCODE || event.keyCode === ENTER_KEYCODE) {
+  if (event.keyCode === window.data.ESC_KEYCODE || event.keyCode === window.data.ENTER_KEYCODE) {
     closePopup();
   }
 };
@@ -190,7 +127,7 @@ var pinClickHandler = function (evt) {
 
 // если нажали на Enter
 var pinKeydownHandler = function (evt) {
-  if (evt.target === ENTER_KEYCODE) {
+  if (evt.target === window.data.ENTER_KEYCODE) {
     pinClickHandler();
   }
 };
@@ -225,7 +162,7 @@ var createOffer = function (offerData, template) {
   getOffer.querySelector('h3').textContent = offer.title;
   getOffer.querySelector('small').textContent = offer.address;
   getOffer.querySelector('.popup__price').textContent = offer.price + '₽/ночь';
-  getOffer.querySelector('h4').textContent = getKeyValue(OFFERS_INFO.type, offer.type);
+  getOffer.querySelector('h4').textContent = getKeyValue(window.data.OFFERS_INFO.type, offer.type);
   getOffer.querySelector('p:nth-of-type(3)').textContent = offer.rooms + ' комнаты для ' + offer.guests + ' гостей';
   getOffer.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + offer.checkin + ', выезд до ' + offer.checkout;
   getOffer.querySelector('p:nth-of-type(5)').textContent = offer.description;
@@ -250,102 +187,12 @@ var createActiveOffer = function (offer, template) {
 // создаем события для шелчка по главному Пину
 var mainPinMouseupHandler = function () {
   mainPin.removeEventListener('mouseup', mainPinMouseupHandler);
-  createAllPins(nearBy);
+  createAllPins(allOffersArray);
   document.querySelector('.map').classList.remove('map--faded');
-  setMinMaxPriceAttribute();
-  noticeForm.classList.remove('notice__form--disabled');
-  for (var j = 0; j < fieldsets.length; j++) {
-    fieldsets[j].removeAttribute('disabled', 'disabled');
-  }
+  window.form.enableForm();
 };
 
 // щелкаем по главному пину
 mainPin.addEventListener('mouseup', mainPinMouseupHandler);
 
 // форма доступна для заполнения
-
-// синхронизируем время заезда и выезда
-// обработчик события на инпут времени въезда
-var timeInInputHandler = function () {
-  timeOutInput.value = timeInInput.value;
-};
-// обработчик события на инпут времени въезда
-var timeOutInputHandler = function () {
-  timeInInput.value = timeOutInput.value;
-};
-
-// слушаем изменения в инпуте времени въезда
-timeInInput.addEventListener('input', timeInInputHandler);
-
-// слушаем изменения в инпуте времени выезда
-timeOutInput.addEventListener('input', timeOutInputHandler);
-
-// синхронизируем тип жилья с ценой
-
-// функция для обработки min-max жилья
-var setMinMaxPriceAttribute = function () {
-  if (accomodationTypeSelect.value === 'bungalo') {
-    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.bungalo);
-  } else if (accomodationTypeSelect.value === 'flat') {
-    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.flat);
-  } else if (accomodationTypeSelect.value === 'house') {
-    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.house);
-  } else {
-    accomodationPriceInput.setAttribute('min', MIN_PRICES_PER_TYPE.palace);
-  }
-};
-
-// обработчик события на селект с типом жилья
-var accomodationTypeSelectHandler = function () {
-  setMinMaxPriceAttribute();
-};
-
-// слушаем изменения в селекте жилья
-accomodationTypeSelect.addEventListener('input', accomodationTypeSelectHandler);
-
-// синхронизируем количество комнат с количеством гостей
-// обработчик события на селект с количеством комнат
-var roomNumberSelectHadler = function (evt) {
-  var roomCount = evt.target.value;
-  var options = capacitySelect.options;
-  var hasSelected = false;
-
-  for (var j = 0; i < options.length; j++) {
-    var currentOption = options[j]; // тут будет число
-    var currentOptionValue = currentOption.value; // тут будет число (вместимость)
-    var suitableCapacity = ROOM_CAPACITY[roomCount]; // массив со значениями (value) подходящей вместительности
-    var isDisabled = suitableCapacity.indexOf(currentOptionValue) === -1; // если в массиве нет значения текущей опции, то статус опции disabled = true
-
-    currentOption.selected = false; // для начала делаем пункт не выбраным
-    currentOption.disabled = isDisabled; // применяем к атрибуту disabled
-    if (!isDisabled && !hasSelected) { // если не disabled  и еще нет выбранного нами вручную пункта
-      currentOption.selected = true;
-      hasSelected = true; // назначаем значение true, что бы больше не заходить в это условие(selected в списке должен быть только один)
-    }
-  }
-};
-
-roomNumberSelect.addEventListener('input', roomNumberSelectHadler);
-
-//
-
-var submit = noticeForm.querySelector('.form__submit');
-var inputs = noticeForm.querySelectorAll('input');
-
-var checkValidity = function () {
-  for (i = 0; i < inputs.length; i++) {
-    var input = inputs[i];
-    if (input.checkValidity() === false) {
-      input.style.borderColor = '#ff6d51';
-      onSubmitClick.evt.preventDefault();
-    } else {
-      input.style.borderColor = '#03f8c1';
-    }
-  }
-};
-
-var onSubmitClick = function () {
-  checkValidity();
-};
-
-submit.addEventListener('click', onSubmitClick);
