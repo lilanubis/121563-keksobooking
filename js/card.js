@@ -7,30 +7,24 @@
     return obj[key];
   };
 
-  // заводим переменную для активного попапа с карточкой
-  var activePopup = null;
-
-  // что происходит при закрытии карточки
-  var closePopup = function () {
-    window.pin.activePin.classList.remove('map__pin--active');
-    window.popupCloseButton = activePopup.querySelector('.popup__close');
-    window.popupCloseButton.removeEventListener('click', popupCloseButtonClickHandler);
-    map.removeEventListener('keydown', popupCloseButtonKeydownHandler);
-    activePopup.remove();
-    activePopup = null;
-    window.popupCloseButton = activePopup.querySelector('.popup__close');
-    window.popupCloseButton.removeEventListener('click', popupCloseButtonClickHandler);
-    map.removeEventListener('keydown', popupCloseButtonKeydownHandler);
-    activePopup.remove();
-    activePopup = null;
-  };
-
   var showPopup = function (evt) {
     var pinData = evt.currentTarget.pinData;
     var activePin = evt.currentTarget;
     createActiveOffer(pinData, document.querySelector('template'));
     activePin.classList.add('map__pin--active');
-    map.addEventListener('keydown', window.card.popupCloseButtonKeydownHandler);
+    map.addEventListener('keydown', popupCloseButtonKeydownHandler);
+  };
+
+  // что происходит при закрытии карточки
+  var closePopup = function () {
+    var activePopup = document.querySelector('.map__card.popup');
+    if (activePopup) {
+      var popupCloseButton = activePopup.querySelector('.popup__close');
+      popupCloseButton.removeEventListener('click', popupCloseButtonClickHandler);
+      activePopup.remove();
+      map.removeEventListener('keydown', popupCloseButtonKeydownHandler);
+      document.querySelector('.map__pin.map__pin--active').classList.remove('map__pin--active');
+    }
   };
 
   // обработчик закрытия карточки
@@ -46,8 +40,8 @@
   };
 
   // собираем шаблон карточки с предложением
-  var createOffer = function (offerData, template) {
-    var offerTemplate = template.cloneNode(true).content;
+  var createOffer = function (offerData) {
+    var offerTemplate = document.querySelector('template').cloneNode(true).content;
     var offer = offerData.offer;
     offerTemplate.querySelector('h3').textContent = offer.title;
     offerTemplate.querySelector('small').textContent = offer.address;
@@ -68,23 +62,18 @@
   };
 
   // cоздаем шаблон одной активной карточки
-  var createActiveOffer = function (offer, template) {
-    var offerElement = createOffer(offer, template);
-    return map.insertBefore(offerElement, map.children[1]);
+  var createActiveOffer = function (offer) {
+    var offerElement = createOffer(offer);
+    map.insertBefore(offerElement, map.children[1]);
 
     // слушаем клики
     var popupCloseButton = document.querySelector('.popup__close');
     popupCloseButton.addEventListener('click', window.card.closePopup);
-    popupCloseButton.addEventListener('keydown', window.card.popupCloseButtonClickHandler);
+    popupCloseButton.addEventListener('keydown', popupCloseButtonKeydownHandler);
   };
 
   window.card = {
-    createActiveOffer: createActiveOffer,
     closePopup: closePopup,
-    popupCloseButtonClickHandler: popupCloseButtonClickHandler
-  };
-
-  window.card = {
     showPopup: showPopup
   };
 })();

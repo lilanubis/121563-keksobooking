@@ -87,7 +87,6 @@
       var input = inputs[i];
       if (input.checkValidity() === false) {
         input.style.borderColor = '#ff6d51';
-        onSubmitClick.evt.preventDefault();
       } else {
         input.style.borderColor = '#03f8c1';
       }
