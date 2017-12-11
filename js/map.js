@@ -23,7 +23,7 @@
   };
 
   // собираем шаблон массива allOffersArray
-  var createallOffersArray = function (numberOfOffers, offersInfo) {
+  var createAlloffersArray = function (numberOfOffers, offersInfo) {
     var allOffersArray = [];
     for (var k = 0; k < numberOfOffers; k++) {
       var x = getRandomNumber(window.data.LOCATION_MIN_MAX.x.min, window.data.LOCATION_MIN_MAX.x.max);
@@ -55,7 +55,7 @@
   };
 
   // собираем массив allOffersArray из реальных данных
-  window.allOffersArray = createallOffersArray(window.data.NUMBER_OF_OFFERS, window.data.OFFERS_INFO);
+  window.allOffersArray = createAlloffersArray(window.data.NUMBER_OF_OFFERS, window.data.OFFERS_INFO);
 
   // drag для главного пина
   var map = document.querySelector('.map');
