@@ -56,4 +56,31 @@
 
   // собираем массив allOffersArray из реальных данных
   window.allOffersArray = createallOffersArray(window.data.NUMBER_OF_OFFERS, window.data.OFFERS_INFO);
+
+  // drag для главного пина
+  var map = document.querySelector('.map');
+  var mainPin = map.querySelector('.map__pin--main');
+  mainPin.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+    var mouseMoveHandler = function (mvEvt) {
+      mvEvt.preventDefault();
+      if (mvEvt.clientY > 100 && mvEvt.clientY < 500) {
+        mainPin.style.top = (mvEvt.clientY + 'px');
+        mainPin.style.left = (mvEvt.clientX + 'px');
+      }
+      window.movePin = {
+        x: mvEvt.clientX,
+        y: mvEvt.clientY - window.data.PIN_HEIGHT
+      };
+      var accomodationAddress = document.querySelector('#address');
+      accomodationAddress.value = 'x: ' + window.movePin.x + ', y: ' + window.movePin.y;
+    };
+    var mouseUpHandler = function (upEvt) {
+      upEvt.preventDefault();
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+    };
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+  });
 })();
