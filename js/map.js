@@ -76,12 +76,12 @@
         x: mvEvt.clientX,
         y: mvEvt.clientY
       };
-      if (mvEvt.clientY > 100 && mvEvt.clientY < 500) {
+      if (mvEvt.pageY > 100 && mvEvt.pageY < 500 && mainPin.offsetLeft > 0 && mainPin.offsetLeft < 1200) {
         mainPin.style.top = mainPin.offsetTop - shiftPoints.y + 'px';
         mainPin.style.left = mainPin.offsetLeft - shiftPoints.x + 'px';
         window.movePin = {
-          x: mvEvt.clientX,
-          y: mvEvt.clientY - window.data.PIN_HEIGHT
+          x: mvEvt.pageX,
+          y: mvEvt.pageY - window.data.PIN_HEIGHT
         };
         window.setAddressCoordinates();
       }
