@@ -23,7 +23,7 @@
   };
 
   // собираем шаблон массива allOffersArray
-  var createallOffersArray = function (numberOfOffers, offersInfo) {
+  var createAlloffersArray = function (numberOfOffers, offersInfo) {
     var allOffersArray = [];
     for (var k = 0; k < numberOfOffers; k++) {
       var x = getRandomNumber(window.data.LOCATION_MIN_MAX.x.min, window.data.LOCATION_MIN_MAX.x.max);
@@ -55,5 +55,43 @@
   };
 
   // собираем массив allOffersArray из реальных данных
-  window.allOffersArray = createallOffersArray(window.data.NUMBER_OF_OFFERS, window.data.OFFERS_INFO);
+  window.allOffersArray = createAlloffersArray(window.data.NUMBER_OF_OFFERS, window.data.OFFERS_INFO);
+
+  // drag для главного пина
+  var map = document.querySelector('.map');
+  var mainPin = map.querySelector('.map__pin--main');
+  mainPin.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+    var startPoints = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
+    var mouseMoveHandler = function (mvEvt) {
+      mvEvt.preventDefault();
+      var shiftPoints = {
+        x: startPoints.x - mvEvt.clientX,
+        y: startPoints.y - mvEvt.clientY
+      };
+      startPoints = {
+        x: mvEvt.clientX,
+        y: mvEvt.clientY
+      };
+      if (mvEvt.pageY > 100 && mvEvt.pageY < 500) {
+        mainPin.style.top = mainPin.offsetTop - shiftPoints.y + 'px';
+        mainPin.style.left = mainPin.offsetLeft - shiftPoints.x + 'px';
+        var movePin = {
+          x: mainPin.offsetLeft - shiftPoints.x,
+          y: (mainPin.offsetTop - shiftPoints.y) - window.data.PIN_HEIGHT
+        };
+        window.form.setAddressCoordinates(movePin.x, movePin.y);
+      }
+    };
+    var mouseUpHandler = function (upEvt) {
+      upEvt.preventDefault();
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+    };
+    document.addEventListener('mousemove', mouseMoveHandler);
+    document.addEventListener('mouseup', mouseUpHandler);
+  });
 })();

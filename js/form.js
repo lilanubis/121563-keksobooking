@@ -10,6 +10,7 @@
   var accomodationTypeSelect = document.querySelector('#type');
   var accomodationPriceInput = document.querySelector('#price');
   var roomNumberSelect = document.querySelector('#room_number');
+  var accomodationAddress = document.querySelector('#address');
   var capacitySelect = document.querySelector('#capacity');
   var fieldsets = document.querySelectorAll('fieldset');
 
@@ -87,8 +88,6 @@
       var input = inputs[i];
       if (input.checkValidity() === false) {
         input.style.borderColor = '#ff6d51';
-      } else {
-        input.style.borderColor = '#03f8c1';
       }
     }
   };
@@ -109,6 +108,9 @@
     setMinMaxPriceAttribute();
   };
   window.form = {
-    enableForm: enableForm
+    enableForm: enableForm,
+    setAddressCoordinates: function setAddressCoordinates(x, y) {
+      accomodationAddress.value = 'x: ' + x + ', y: ' + y;
+    }
   };
 })();
