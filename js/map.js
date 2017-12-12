@@ -62,18 +62,29 @@
   var mainPin = map.querySelector('.map__pin--main');
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
+    var startPoints = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
     var mouseMoveHandler = function (mvEvt) {
       mvEvt.preventDefault();
-      if (mvEvt.clientY > 100 && mvEvt.clientY < 500) {
-        mainPin.style.top = (mvEvt.clientY + 'px');
-        mainPin.style.left = (mvEvt.clientX + 'px');
-      }
-      window.movePin = {
-        x: mvEvt.clientX,
-        y: mvEvt.clientY - window.data.PIN_HEIGHT
+      var shiftPoints = {
+        x: startPoints.x - mvEvt.clientX,
+        y: startPoints.y - mvEvt.clientY
       };
-      var accomodationAddress = document.querySelector('#address');
-      accomodationAddress.value = 'x: ' + window.movePin.x + ', y: ' + window.movePin.y;
+      startPoints = {
+        x: mvEvt.clientX,
+        y: mvEvt.clientY
+      };
+      if (mvEvt.clientY > 100 && mvEvt.clientY < 500) {
+        mainPin.style.top = mainPin.offsetTop - shiftPoints.y + 'px';
+        mainPin.style.left = mainPin.offsetLeft - shiftPoints.x + 'px';
+        window.movePin = {
+          x: mvEvt.clientX,
+          y: mvEvt.clientY - window.data.PIN_HEIGHT
+        };
+        window.setAddressCoordinates();
+      }
     };
     var mouseUpHandler = function (upEvt) {
       upEvt.preventDefault();

@@ -10,6 +10,7 @@
   var accomodationTypeSelect = document.querySelector('#type');
   var accomodationPriceInput = document.querySelector('#price');
   var roomNumberSelect = document.querySelector('#room_number');
+  var accomodationAddress = document.querySelector('#address');
   var capacitySelect = document.querySelector('#capacity');
   var fieldsets = document.querySelectorAll('fieldset');
 
@@ -18,6 +19,10 @@
     fieldsets[i].setAttribute('disabled', 'disabled');
   }
 
+  //
+  window.setAddressCoordinates = function () {
+    accomodationAddress.value = 'x: ' + window.movePin.x + ', y: ' + window.movePin.y;
+  };
   // синхронизируем время заезда и выезда
   // обработчик события на инпут времени въезда
   var timeInInputHandler = function () {
