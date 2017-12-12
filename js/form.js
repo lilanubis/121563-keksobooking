@@ -19,10 +19,6 @@
     fieldsets[i].setAttribute('disabled', 'disabled');
   }
 
-  //
-  window.setAddressCoordinates = function () {
-    accomodationAddress.value = 'x: ' + window.movePin.x + ', y: ' + window.movePin.y;
-  };
   // синхронизируем время заезда и выезда
   // обработчик события на инпут времени въезда
   var timeInInputHandler = function () {
@@ -112,6 +108,9 @@
     setMinMaxPriceAttribute();
   };
   window.form = {
-    enableForm: enableForm
+    enableForm: enableForm,
+    setAddressCoordinates: function setAddressCoordinates(x, y) {
+      accomodationAddress.value = 'x: ' + x + ', y: ' + y;
+    }
   };
 })();

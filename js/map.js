@@ -76,14 +76,14 @@
         x: mvEvt.clientX,
         y: mvEvt.clientY
       };
-      if (mvEvt.pageY > 100 && mvEvt.pageY < 500 && mainPin.offsetLeft > 0 && mainPin.offsetLeft < 1200) {
+      if (mvEvt.pageY > 100 && mvEvt.pageY < 500) {
         mainPin.style.top = mainPin.offsetTop - shiftPoints.y + 'px';
         mainPin.style.left = mainPin.offsetLeft - shiftPoints.x + 'px';
-        window.movePin = {
-          x: mvEvt.pageX,
-          y: mvEvt.pageY - window.data.PIN_HEIGHT
+        var movePin = {
+          x: mainPin.offsetLeft - shiftPoints.x,
+          y: (mainPin.offsetTop - shiftPoints.y) - window.data.PIN_HEIGHT
         };
-        window.setAddressCoordinates();
+        window.form.setAddressCoordinates(movePin.x, movePin.y);
       }
     };
     var mouseUpHandler = function (upEvt) {
