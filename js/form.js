@@ -38,25 +38,33 @@
   // синхронизируем тип жилья с ценой
 
   // функция для обработки min-max жилья
-  var setMinMaxPriceAttribute = function () {
-    if (accomodationTypeSelect.value === 'bungalo') {
-      accomodationPriceInput.setAttribute('min', window.data.MIN_PRICES_PER_TYPE.bungalo);
-    } else if (accomodationTypeSelect.value === 'flat') {
-      accomodationPriceInput.setAttribute('min', window.data.MIN_PRICES_PER_TYPE.flat);
-    } else if (accomodationTypeSelect.value === 'house') {
-      accomodationPriceInput.setAttribute('min', window.data.MIN_PRICES_PER_TYPE.house);
-    } else {
-      accomodationPriceInput.setAttribute('min', window.data.MIN_PRICES_PER_TYPE.palace);
-    }
-  };
+  // var setMinMaxPriceAttribute = function () {
+  //   if (accomodationTypeSelect.value === 'bungalo') {
+  //     accomodationPriceInput.setAttribute('min', window.data.MIN_PRICES_PER_TYPE.bungalo);
+  //   } else if (accomodationTypeSelect.value === 'flat') {
+  //     accomodationPriceInput.setAttribute('min', window.data.MIN_PRICES_PER_TYPE.flat);
+  //   } else if (accomodationTypeSelect.value === 'house') {
+  //     accomodationPriceInput.setAttribute('min', window.data.MIN_PRICES_PER_TYPE.house);
+  //   } else {
+  //     accomodationPriceInput.setAttribute('min', window.data.MIN_PRICES_PER_TYPE.palace);
+  //   }
+  // };
 
+  // СМОТРЕТЬ ОТСЮДА
+  var accomodations = ['bungalo', 'flat', 'house', 'palace'];
+  var prices = ['0', '1000', '5000', '10000'];
+  var syncValueWithMin = function () {
+    accomodationPriceInput.setAttribute('min', prices[window.index]);
+  };
   // обработчик события на селект с типом жилья
   var accomodationTypeSelectHandler = function () {
-    setMinMaxPriceAttribute();
+    // setMinMaxPriceAttribute();
+    window.synchronizeFields(accomodationTypeSelect, accomodationPriceInput, accomodations, prices, syncValueWithMin);
   };
 
   // слушаем изменения в селекте жилья
   accomodationTypeSelect.addEventListener('input', accomodationTypeSelectHandler);
+  // ДАЛЬШЕ МОЖНО НЕ СМОТРЕТЬ :D
 
   // синхронизируем количество комнат с количеством гостей
   // обработчик события на селект с количеством комнат
@@ -105,7 +113,7 @@
     for (var j = 0; j < fieldsets.length; j++) {
       fieldsets[j].removeAttribute('disabled', 'disabled');
     }
-    setMinMaxPriceAttribute();
+    // setMinMaxPriceAttribute();
   };
   window.form = {
     enableForm: enableForm,
