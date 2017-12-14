@@ -10,12 +10,12 @@
     var activePopup = document.querySelector('.map__card.popup');
     // если карточки на экране нет
     if (!activePopup) {
-      window.card.showPopup(evt);
+      window.showCard.showCard(evt);
 
     // если карточка на экране уже есть
     } else {
       window.card.closePopup();
-      window.card.showPopup(evt);
+      window.showCard.showCard(evt);
     }
   };
 

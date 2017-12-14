@@ -7,14 +7,6 @@
     return obj[key];
   };
 
-  var showPopup = function (evt) {
-    var pinData = evt.currentTarget.pinData;
-    var activePin = evt.currentTarget;
-    createActiveOffer(pinData, document.querySelector('template'));
-    activePin.classList.add('map__pin--active');
-    map.addEventListener('keydown', popupCloseButtonKeydownHandler);
-  };
-
   // что происходит при закрытии карточки
   var closePopup = function () {
     var activePopup = document.querySelector('.map__card.popup');
@@ -74,6 +66,7 @@
 
   window.card = {
     closePopup: closePopup,
-    showPopup: showPopup
+    createActiveOffer: createActiveOffer,
+    popupCloseButtonKeydownHandler: popupCloseButtonKeydownHandler
   };
 })();
