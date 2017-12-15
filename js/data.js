@@ -34,10 +34,8 @@ window.data = {
   },
   // константы для формы
   MIN_PRICES_PER_TYPE: {
-    bungalo: 0,
-    flat: 1000,
-    house: 5000,
-    palace: 10000
+    accomodations: ['bungalo', 'flat', 'house', 'palace'],
+    prices: [0, 1000, 5000, 10000]
   },
   ROOM_CAPACITY: {
     '1': ['1'],
