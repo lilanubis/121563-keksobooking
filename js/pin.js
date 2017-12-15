@@ -10,12 +10,12 @@
     var activePopup = document.querySelector('.map__card.popup');
     // если карточки на экране нет
     if (!activePopup) {
-      window.card.showPopup(evt);
+      window.showCard(evt);
 
     // если карточка на экране уже есть
     } else {
       window.card.closePopup();
-      window.card.showPopup(evt);
+      window.showCard(evt);
     }
   };
 
@@ -53,6 +53,7 @@
     mainPin.removeEventListener('mouseup', mainPinMouseupHandler);
     createAllPins(window.allOffersArray);
     document.querySelector('.map').classList.remove('map--faded');
+    // TODO здесь надо synchrnize fields для цены жилья!!
     window.form.enableForm();
   };
 

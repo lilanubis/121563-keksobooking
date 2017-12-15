@@ -60,30 +60,70 @@
   // drag для главного пина
   var map = document.querySelector('.map');
   var mainPin = map.querySelector('.map__pin--main');
+  // выносим переменные, что бы не создавать их при каждом вызове функции
+  var shiftPoints;
+  var startPoints;
+  var mainPinCoordinates;
+  var left;
+  var top;
+  // максимальные координаты (х у) c учетом высоты пина
+  var maxYCoordinate = 500 - window.data.PIN_HEIGHT;
+  var minYCoordinate = 100 - window.data.PIN_HEIGHT;
+  // ограничения пина по бокам
+  var minLeft = 0;
+  var maxLeft = 1200;
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
-    var startPoints = {
+    // начальные координаты мыши
+    startPoints = {
       x: evt.clientX,
       y: evt.clientY
     };
     var mouseMoveHandler = function (mvEvt) {
       mvEvt.preventDefault();
-      var shiftPoints = {
+      // смещение
+      shiftPoints = {
         x: startPoints.x - mvEvt.clientX,
         y: startPoints.y - mvEvt.clientY
       };
+      // перезаписываем координаты мыши (с события mousedown) на текущие координаты
       startPoints = {
         x: mvEvt.clientX,
         y: mvEvt.clientY
       };
-      if (mvEvt.pageY > 100 && mvEvt.pageY < 500) {
-        mainPin.style.top = mainPin.offsetTop - shiftPoints.y + 'px';
-        mainPin.style.left = mainPin.offsetLeft - shiftPoints.x + 'px';
-        var movePin = {
-          x: mainPin.offsetLeft - shiftPoints.x,
-          y: (mainPin.offsetTop - shiftPoints.y) - window.data.PIN_HEIGHT
-        };
-        window.form.setAddressCoordinates(movePin.x, movePin.y);
+      // текущие координаты пина
+      mainPinCoordinates = {
+        x: mainPin.offsetLeft,
+        y: mainPin.offsetTop
+      };
+      // если перетянут пин до 100пх, но напрвление следующего mouse move(shiftPoints.y < 0) вниз то перетягивает
+      // второе условие: если перетянут до 100пх, и направление вверх то перетягивает
+      if ((mainPinCoordinates.y > minYCoordinate || shiftPoints.y < 0) && (mainPinCoordinates.y < maxYCoordinate || shiftPoints.y > 0)) {
+        left = mainPin.offsetLeft - shiftPoints.x;
+        top = mainPin.offsetTop - shiftPoints.y;
+
+        // проверяем выходит ли пин за боковые границы, если выходит то оставляем его "на границе"
+        if (left < minLeft) {
+          left = minLeft;
+          mainPinCoordinates.x = minLeft;
+        } else if (left > maxLeft) {
+          left = maxLeft;
+          mainPinCoordinates.x = maxLeft;
+        }
+
+        // проверяем ограничения пина по верху и низу карты
+        if (top < minYCoordinate) {
+          top = minYCoordinate;
+          mainPinCoordinates.y = minYCoordinate;
+        } else if (top > maxYCoordinate) {
+          top = maxYCoordinate;
+          mainPinCoordinates.y = maxYCoordinate;
+        }
+
+        mainPin.style.top = top + 'px';
+        mainPin.style.left = left + 'px';
+
+        window.form.setAddressCoordinates(left, top + window.data.PIN_HEIGHT);
       }
     };
     var mouseUpHandler = function (upEvt) {
