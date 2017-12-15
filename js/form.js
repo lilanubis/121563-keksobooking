@@ -19,13 +19,18 @@
     fieldsets[i].setAttribute('disabled', 'disabled');
   }
 
+  // синхронизируем тип жилья с ценой
+  var syncValueWithMin = function (accomodationsPriceInput, value) {
+    accomodationPriceInput.setAttribute('min', value);
+  };
+
   // синхронизируем время заезда и выезда
   // обработчик события на инпут времени въезда и выезда
   var timeInOutInputHandler = function (evt) {
-    var mainInput = timeInInput;
-    var dependetInput = timeOutInput;
-
-    if (evt.target === timeOutInput) {
+    if (evt.target === timeInInput) {
+      var mainInput = timeInInput;
+      var dependetInput = timeOutInput;
+    } else {
       mainInput = timeOutInput;
       dependetInput = timeInInput;
     }
@@ -41,16 +46,11 @@
   timeOutInput.addEventListener('input', timeInOutInputHandler);
 
   // добавим дату в переменные для краткости
-  var prices = window.data.MIN_PRICES_PER_TYPE.price;
+  var prices = window.data.MIN_PRICES_PER_TYPE.prices;
   var accomodations = window.data.MIN_PRICES_PER_TYPE.accomodations;
 
-  // синхронизируем тип жилья с ценой
-  var syncValueWithMin = function () {
-    accomodationPriceInput.setAttribute('min', prices[window.index]);
-  };
   // обработчик события на селект с типом жилья
   var accomodationTypeSelectHandler = function () {
-    debugger;
     window.synchronizeFields(accomodationTypeSelect, accomodationPriceInput, accomodations, prices, syncValueWithMin);
   };
 
@@ -104,7 +104,7 @@
     for (var j = 0; j < fieldsets.length; j++) {
       fieldsets[j].removeAttribute('disabled', 'disabled');
     }
-    // setMinMaxPriceAttribute();
+    window.synchronizeFields(accomodationTypeSelect, accomodationPriceInput, accomodations, prices, syncValueWithMin);
   };
   window.form = {
     enableForm: enableForm,
