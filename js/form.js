@@ -64,7 +64,7 @@
     var options = capacitySelect.options;
     var hasSelected = false;
 
-    for (var j = 0; i < options.length; j++) {
+    for (var j = 0; j < options.length; j++) {
       var currentOption = options[j];
       var currentOptionValue = currentOption.value;
       var suitableCapacity = window.data.ROOM_CAPACITY[roomCount];
