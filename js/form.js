@@ -27,12 +27,14 @@
   // синхронизируем время заезда и выезда
   // обработчик события на инпут времени въезда и выезда
   var timeInOutInputHandler = function (evt) {
-    if (evt.target === timeInInput) {
-      var mainInput = timeInInput;
-      var dependetInput = timeOutInput;
-    } else {
+    var mainInput;
+    var dependetInput;
+    if (evt.target === timeOutInput) {
       mainInput = timeOutInput;
       dependetInput = timeInInput;
+    } else {
+      mainInput = timeInInput;
+      dependetInput = timeOutInput;
     }
     function syncValues(element, value) {
       element.value = value;
