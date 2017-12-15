@@ -53,6 +53,7 @@
     mainPin.removeEventListener('mouseup', mainPinMouseupHandler);
     createAllPins(window.allOffersArray);
     document.querySelector('.map').classList.remove('map--faded');
+    // TODO здесь надо synchrnize fields для цены жилья!!
     window.form.enableForm();
   };
 

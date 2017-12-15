@@ -20,51 +20,42 @@
   }
 
   // синхронизируем время заезда и выезда
-  // обработчик события на инпут времени въезда
-  var timeInInputHandler = function () {
-    timeOutInput.value = timeInInput.value;
-  };
-  // обработчик события на инпут времени въезда
-  var timeOutInputHandler = function () {
-    timeInInput.value = timeOutInput.value;
-  };
+  // обработчик события на инпут времени въезда и выезда
+  var timeInOutInputHandler = function (evt) {
+    var mainInput = timeInInput;
+    var dependetInput = timeOutInput;
 
+    if (evt.target === timeOutInput) {
+      mainInput = timeOutInput;
+      dependetInput = timeInInput;
+    }
+    function syncValues(element, value) {
+      element.value = value;
+    }
+    window.synchronizeFields(mainInput, dependetInput, window.data.OFFERS_INFO.checkinout, window.data.OFFERS_INFO.checkinout, syncValues);
+  };
   // слушаем изменения в инпуте времени въезда
-  timeInInput.addEventListener('input', timeInInputHandler);
+  timeInInput.addEventListener('input', timeInOutInputHandler);
 
   // слушаем изменения в инпуте времени выезда
-  timeOutInput.addEventListener('input', timeOutInputHandler);
+  timeOutInput.addEventListener('input', timeInOutInputHandler);
+
+  // добавим дату в переменные для краткости
+  var prices = window.data.MIN_PRICES_PER_TYPE.price;
+  var accomodations = window.data.MIN_PRICES_PER_TYPE.accomodations;
 
   // синхронизируем тип жилья с ценой
-
-  // функция для обработки min-max жилья
-  // var setMinMaxPriceAttribute = function () {
-  //   if (accomodationTypeSelect.value === 'bungalo') {
-  //     accomodationPriceInput.setAttribute('min', window.data.MIN_PRICES_PER_TYPE.bungalo);
-  //   } else if (accomodationTypeSelect.value === 'flat') {
-  //     accomodationPriceInput.setAttribute('min', window.data.MIN_PRICES_PER_TYPE.flat);
-  //   } else if (accomodationTypeSelect.value === 'house') {
-  //     accomodationPriceInput.setAttribute('min', window.data.MIN_PRICES_PER_TYPE.house);
-  //   } else {
-  //     accomodationPriceInput.setAttribute('min', window.data.MIN_PRICES_PER_TYPE.palace);
-  //   }
-  // };
-
-  // СМОТРЕТЬ ОТСЮДА
-  var accomodations = ['bungalo', 'flat', 'house', 'palace'];
-  var prices = ['0', '1000', '5000', '10000'];
   var syncValueWithMin = function () {
     accomodationPriceInput.setAttribute('min', prices[window.index]);
   };
   // обработчик события на селект с типом жилья
   var accomodationTypeSelectHandler = function () {
-    // setMinMaxPriceAttribute();
+    debugger;
     window.synchronizeFields(accomodationTypeSelect, accomodationPriceInput, accomodations, prices, syncValueWithMin);
   };
 
   // слушаем изменения в селекте жилья
   accomodationTypeSelect.addEventListener('input', accomodationTypeSelectHandler);
-  // ДАЛЬШЕ МОЖНО НЕ СМОТРЕТЬ :D
 
   // синхронизируем количество комнат с количеством гостей
   // обработчик события на селект с количеством комнат
