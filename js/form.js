@@ -84,18 +84,38 @@
 
   //  проверяем валидность формы
   // объявление функции, проверяющей валидность
+  var formIsValid;
   var checkValidity = function () {
     for (i = 0; i < inputs.length; i++) {
       var input = inputs[i];
       if (input.checkValidity() === false) {
         input.style.borderColor = '#ff6d51';
+        formIsValid = false;
+        break;
+      } else if (input.checkValidity() === true) {
+        formIsValid = true;
+        input.style.borderColor = 'transparent';
       }
     }
+    return formIsValid;
   };
 
-  // обработчик события для
-  var onSubmitClick = function () {
+  // эта функция будет сбрасывать дату у формы и тд
+  var resetForm = function () {
+    noticeForm.reset();
+    console.log('сбрасываю форму'); //temp
+  }
+  var formNotSent = function () {
+    console.log('ошибка! ошибка!'); //temp
+  };
+
+  // обработчик события для отправки формы
+  var onSubmitClick = function (evt) {
     checkValidity();
+    if (formIsValid) {
+      window.backend.save(new FormData(noticeForm), resetForm, formNotSent);
+    }
+    evt.preventDefault();
   };
 
   submit.addEventListener('click', onSubmitClick);
