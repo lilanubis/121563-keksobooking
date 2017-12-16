@@ -47,6 +47,6 @@ window.data = {
   ESC_KEYCODE: 27,
   ENTER_KEYCODE: 13,
   // переменные для адресов куда грузить данные / откуда выгружать данные
-  URL_LOAD: 'https://1510.dump.academy/keksobooking/data',
-  URL_SAVE: 'https://1510.dump.academy/keksobooking'
+  URL_SAVE: 'https://1510.dump.academy/keksobooking',
+  URL_LOAD: 'https://1510.dump.academy/keksobooking/data'
 };

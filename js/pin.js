@@ -48,15 +48,37 @@
     mapPins.appendChild(fragmentPin);
   };
 
+  // // temp
+  // var onLoad = function () {
+  //   console.log('успех, братан');
+  // };
+  // var onError = function () {
+  //   console.log('фиаско, братан');
+  // }
+
+  var temporaryFunctionLoad = function () {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', window.data.URL_LOAD);
+    xhr.send();
+    xhr.addEventListener('load', function () {
+      window.temporaryData = JSON.parse(xhr.responseText);
+    });
+  };
+
+  temporaryFunctionLoad();
+
   // создаем события для шелчка по главному Пину
   var mainPinMouseupHandler = function () {
     mainPin.removeEventListener('mouseup', mainPinMouseupHandler);
-    createAllPins(window.allOffersArray);
+    createAllPins(window.temporaryData);
     document.querySelector('.map').classList.remove('map--faded');
-    // TODO здесь надо synchrnize fields для цены жилья!!
     window.form.enableForm();
   };
 
   // щелкаем по главному пину
   mainPin.addEventListener('mouseup', mainPinMouseupHandler);
+
+  window.pin = {
+    createAllPins: createAllPins
+  };
 })();

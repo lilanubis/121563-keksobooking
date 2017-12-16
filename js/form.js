@@ -103,10 +103,9 @@
   // эта функция будет сбрасывать дату у формы и тд
   var resetForm = function () {
     noticeForm.reset();
-    console.log('сбрасываю форму'); //temp
-  }
+  };
   var formNotSent = function () {
-    console.log('ошибка! ошибка!'); //temp
+    window.errorMessageCreate(); // temp
   };
 
   // обработчик события для отправки формы
