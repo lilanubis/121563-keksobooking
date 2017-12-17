@@ -101,20 +101,20 @@
   };
 
   // эта функция будет сбрасывать дату у формы и тд
-  var resetForm = function () {
+  var onLoad = function () {
     noticeForm.reset();
   };
-  var formNotSent = function () {
-    window.errorMessageCreate(); // temp
+  var onError = function (errorMessage) {
+    window.errorMessageCreate(errorMessage);
   };
 
   // обработчик события для отправки формы
   var onSubmitClick = function (evt) {
+    evt.preventDefault();
     checkValidity();
     if (formIsValid) {
-      window.backend.save(new FormData(noticeForm), resetForm, formNotSent);
+      window.backend.save(new FormData(noticeForm), onLoad, onError);
     }
-    evt.preventDefault();
   };
 
   submit.addEventListener('click', onSubmitClick);

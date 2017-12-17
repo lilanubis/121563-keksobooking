@@ -1,13 +1,13 @@
 'use strict';
 
 (function () {
-  var setup = function (onSuccess, onError) {
+  var setup = function (onLoad, onError) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
     xhr.addEventListener('load', function () {
       if (xhr.status === 200) {
-        onSuccess(xhr.response);
+        onLoad(xhr.response);
       } else {
         onError(xhr.response);
       }
@@ -25,8 +25,8 @@
   };
 
   window.backend = {
-    save: function (data, onSuccess, onError) {
-      var xhr = setup(onSuccess, onError);
+    save: function (data, onLoad, onError) {
+      var xhr = setup(onLoad, onError);
 
       xhr.open('POST', window.data.URL_SAVE);
       xhr.send(data);

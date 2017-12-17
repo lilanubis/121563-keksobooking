@@ -49,16 +49,16 @@
   };
 
   // обработчики
-  var loadHandler = function (response) {
+  var onLoad = function (response) {
     createAllPins(response);
   };
-  var errorHandler = function () {
-    window.errorMessage();
+  var onError = function (errorMessage) {
+    window.showErrorMessage(errorMessage);
   };
   // создаем события для шелчка по главному Пину
   var mainPinMouseupHandler = function () {
     mainPin.removeEventListener('mouseup', mainPinMouseupHandler);
-    window.backend.load(loadHandler, errorHandler);
+    window.backend.load(onLoad, onError);
     document.querySelector('.map').classList.remove('map--faded');
     window.form.enableForm();
   };
