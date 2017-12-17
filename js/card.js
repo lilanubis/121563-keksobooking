@@ -41,7 +41,7 @@
 
   // собираем шаблон карточки с предложением
   var createOffer = function (offerData) {
-    var offerTemplate = document.querySelector('template').cloneNode(true).content;
+    var offerTemplate = document.querySelector('template').content.querySelector('article').cloneNode(true);
     var offer = offerData.offer;
     offerTemplate.querySelector('h3').textContent = offer.title;
     offerTemplate.querySelector('small').textContent = offer.address;

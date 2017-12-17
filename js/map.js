@@ -1,5 +1,14 @@
 'use strict';
 (function () {
+  // перменные из дома
+  var map = document.querySelector('.map');
+  var mainPin = map.querySelector('.map__pin--main');
+  var housingType = map.querySelector('#housing-type');
+  // var housingPrice = map.querySelector('#housing-price');
+  // var housingRooms = map.querySelector('#housing-rooms');
+  // var housingGuests = map.querySelector('#housing-guests');
+  // var housingFeatures = map.querySelector('#housing-features');
+
   // вспомогательные функции
   // выбрать случайное число от.. до..
   var getRandomNumber = function (min, max) {
@@ -58,8 +67,6 @@
   window.allOffersArray = createAlloffersArray(window.data.NUMBER_OF_OFFERS, window.data.OFFERS_INFO);
 
   // drag для главного пина
-  var map = document.querySelector('.map');
-  var mainPin = map.querySelector('.map__pin--main');
   // выносим переменные, что бы не создавать их при каждом вызове функции
   var shiftPoints;
   var startPoints;
@@ -134,4 +141,49 @@
     document.addEventListener('mousemove', mouseMoveHandler);
     document.addEventListener('mouseup', mouseUpHandler);
   });
+
+  var housingArrayHouse = [];
+  var housingArrayFlat = [];
+  var housingArrayBungalo = [];
+
+  var filterHousingArray = function () {
+    housingArrayHouse = window.mainHousingArray.filter(function (flat) {
+      return flat.offer.type === 'house';
+    });
+    housingArrayFlat = window.mainHousingArray.filter(function (flat) {
+      return flat.offer.type === 'flat';
+    });
+    housingArrayBungalo = window.mainHousingArray.filter(function (flat) {
+      return flat.offer.type === 'bungalo';
+    });
+  };
+
+  var deleteAllPins = function () {
+    var pins = map.querySelectorAll('.map__pin:not(.map__pin--main)');
+    for (var i = 0; i < pins.length; i++) {
+      pins[i].remove();
+    }
+  };
+
+  // фильтрация
+  var housingTypeChangeHandler = function (evt) {
+    deleteAllPins();
+    filterHousingArray();
+    switch (evt.target.value) {
+      case 'house':
+        window.pin.createAllPins(housingArrayHouse, housingArrayHouse.length);
+        break;
+      case 'flat':
+        window.pin.createAllPins(housingArrayFlat, housingArrayFlat.length);
+        break;
+      case 'bungalo':
+        window.pin.createAllPins(housingArrayBungalo, housingArrayFlat.length);
+        break;
+      default:
+        window.pin.createAllPins(window.mainHousingArray, window.mainHousingArray.length);
+    }
+  };
+
+  housingType.addEventListener('change', housingTypeChangeHandler);
+
 })();

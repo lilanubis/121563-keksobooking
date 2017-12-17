@@ -3,7 +3,7 @@
   var map = document.querySelector('.map');
   var mainPin = map.querySelector('.map__pin--main');
   var pinTemplate = document.querySelector('template').content.querySelector('.map__pin');
-  var mapPins = document.querySelector('.map__pins');
+  var mapPins = map.querySelector('.map__pins');
 
   // что происходит при открытии пина
   var pinClickHandler = function (evt) {
@@ -40,9 +40,9 @@
   };
 
   // собираем все пины из реальных данных
-  var createAllPins = function (array) {
+  var createAllPins = function (array, arrayLength) {
     var fragmentPin = document.createDocumentFragment();
-    for (var l = 0; l < array.length; l++) {
+    for (var l = 0; l < arrayLength; l++) {
       fragmentPin.appendChild(createPin(array[l], pinTemplate));
     }
     mapPins.appendChild(fragmentPin);
@@ -50,7 +50,8 @@
 
   // обработчики
   var onLoad = function (response) {
-    createAllPins(response);
+    createAllPins(response, window.data.NUMBER_OF_OFFERS);
+    window.mainHousingArray = response;
   };
   var onError = function (errorMessage) {
     window.showErrorMessage(errorMessage);
