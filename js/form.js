@@ -84,21 +84,51 @@
 
   //  проверяем валидность формы
   // объявление функции, проверяющей валидность
+  var formIsValid;
   var checkValidity = function () {
     for (i = 0; i < inputs.length; i++) {
       var input = inputs[i];
       if (input.checkValidity() === false) {
         input.style.borderColor = '#ff6d51';
+        formIsValid = false;
+        break;
+      } else if (input.checkValidity() === true) {
+        formIsValid = true;
+        input.style.borderColor = 'transparent';
       }
+    }
+    return formIsValid;
+  };
+
+  // эта функция будет сбрасывать дату у формы и тд
+  var onLoad = function () {
+    noticeForm.reset();
+  };
+  var onError = function (errorMessage) {
+    showErrorMessage(errorMessage);
+  };
+
+  // обработчик события для отправки формы
+  var onSubmitClick = function (evt) {
+    evt.preventDefault();
+    checkValidity();
+    if (formIsValid) {
+      window.backend.save(new FormData(noticeForm), onLoad, onError);
     }
   };
 
-  // обработчик события для
-  var onSubmitClick = function () {
-    checkValidity();
-  };
-
   submit.addEventListener('click', onSubmitClick);
+
+  // сообщение об ошибке
+  var showErrorMessage = function (errorMessage) {
+    var errorPopup = document.createElement('div');
+    errorPopup.textContent = errorMessage;
+    errorPopup.style = 'position:fixed;background:rgba(255, 86, 53, 0.9);color:white;width:100%;height:40px;box-shadow: 0 5px 10px #9e1a00;text-align:center;z-index:999;padding-top:15px;font-weight:bold;';
+    document.querySelector('.map').insertAdjacentElement('afterbegin', errorPopup);
+    window.setTimeout(function () {
+      errorPopup.remove();
+    }, 5000);
+  };
 
   // функция для показа формы (для использования при клике по главному пину)
   var enableForm = function () {

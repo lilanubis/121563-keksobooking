@@ -45,5 +45,8 @@ window.data = {
   },
   // константы для кнопок на клаве
   ESC_KEYCODE: 27,
-  ENTER_KEYCODE: 13
+  ENTER_KEYCODE: 13,
+  // переменные для адресов куда грузить данные / откуда выгружать данные
+  URL_SAVE: 'https://1510.dump.academy/keksobooking',
+  URL_LOAD: 'https://1510.dump.academy/keksobooking/data'
 };
