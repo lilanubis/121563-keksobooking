@@ -105,7 +105,7 @@
     noticeForm.reset();
   };
   var onError = function (errorMessage) {
-    window.errorMessageCreate(errorMessage);
+    showErrorMessage(errorMessage);
   };
 
   // обработчик события для отправки формы
@@ -118,6 +118,17 @@
   };
 
   submit.addEventListener('click', onSubmitClick);
+
+  // сообщение об ошибке
+  var showErrorMessage = function (errorMessage) {
+    var errorPopup = document.createElement('div');
+    errorPopup.textContent = errorMessage;
+    errorPopup.style = 'position:fixed;background:rgba(255, 86, 53, 0.9);color:white;width:100%;height:40px;box-shadow: 0 5px 10px #9e1a00;text-align:center;z-index:999;padding-top:15px;font-weight:bold;';
+    document.querySelector('.map').insertAdjacentElement('afterbegin', errorPopup);
+    window.setTimeout(function () {
+      errorPopup.remove();
+    }, 5000);
+  };
 
   // функция для показа формы (для использования при клике по главному пину)
   var enableForm = function () {
