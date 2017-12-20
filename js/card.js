@@ -8,6 +8,7 @@
   };
 
   var showPopup = function (evt) {
+    closePopup();
     var pinData = evt.currentTarget.pinData;
     var activePin = evt.currentTarget;
     createActiveOffer(pinData, document.querySelector('template'));
@@ -19,11 +20,14 @@
   var closePopup = function () {
     var activePopup = document.querySelector('.map__card.popup');
     if (activePopup) {
+      var activePin = document.querySelector('.map__pin.map__pin--active');
       var popupCloseButton = activePopup.querySelector('.popup__close');
       popupCloseButton.removeEventListener('click', popupCloseButtonClickHandler);
       activePopup.remove();
       map.removeEventListener('keydown', popupCloseButtonKeydownHandler);
-      document.querySelector('.map__pin.map__pin--active').classList.remove('map__pin--active');
+      if (activePin) {
+        document.querySelector('.map__pin.map__pin--active').classList.remove('map__pin--active');
+      }
     }
   };
 
@@ -32,7 +36,7 @@
     closePopup();
   };
 
-    // если нажали на Esc или на enter по крестику
+  // если нажали на Esc или на enter по крестику
   var popupCloseButtonKeydownHandler = function (event) {
     if (event.keyCode === window.data.ESC_KEYCODE || event.keyCode === window.data.ENTER_KEYCODE) {
       closePopup();
@@ -51,11 +55,10 @@
     offerTemplate.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + offer.checkin + ', выезд до ' + offer.checkout;
     offerTemplate.querySelector('p:nth-of-type(5)').textContent = offer.description;
     offerTemplate.querySelector('img').src = offerData.author.avatar;
-    offerTemplate.querySelector('.popup__features').innerHTML = '';
 
     var featuresHtmlString = '';
-    for (var j = 0; j < offerData.offer.features.length; j++) {
-      featuresHtmlString += '<li class="feature feature--' + offerData.offer.features[j] + '"></li>';
+    for (var i = 0; i < offerData.offer.features.length; i++) {
+      featuresHtmlString += '<li class="feature feature--' + offerData.offer.features[i] + '"></li>';
     }
     offerTemplate.querySelector('.popup__features').insertAdjacentHTML('afterbegin', featuresHtmlString);
     return offerTemplate;
@@ -68,12 +71,12 @@
 
     // слушаем клики
     var popupCloseButton = document.querySelector('.popup__close');
-    popupCloseButton.addEventListener('click', window.card.closePopup);
+    popupCloseButton.addEventListener('click', closePopup);
     popupCloseButton.addEventListener('keydown', popupCloseButtonKeydownHandler);
   };
 
   window.card = {
-    closePopup: closePopup,
-    showPopup: showPopup
+    closeCard: closePopup,
+    showCard: showPopup
   };
 })();
