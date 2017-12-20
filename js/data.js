@@ -43,6 +43,14 @@ window.data = {
     '3': ['1', '2', '3'],
     '100': ['0']
   },
+  PRICES_OPTIONS: {
+    low: 10000,
+    middle: {
+      min: 10000,
+      max: 50000
+    },
+    high: 50000
+  },
   // константы для кнопок на клаве
   ESC_KEYCODE: 27,
   ENTER_KEYCODE: 13,

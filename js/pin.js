@@ -50,7 +50,7 @@
 
   // обработчики
   var onLoad = function (response) {
-    createAllPins(response, window.data.NUMBER_OF_OFFERS);
+    createAllPins(response, response.length);
     window.mainHousingArray = response;
   };
   var onError = function (errorMessage) {

@@ -4,10 +4,10 @@
   var map = document.querySelector('.map');
   var mainPin = map.querySelector('.map__pin--main');
   var housingType = map.querySelector('#housing-type');
-  // var housingPrice = map.querySelector('#housing-price');
-  // var housingRooms = map.querySelector('#housing-rooms');
-  // var housingGuests = map.querySelector('#housing-guests');
-  // var housingFeatures = map.querySelector('#housing-features');
+  var housingPrice = map.querySelector('#housing-price');
+  var housingRooms = map.querySelector('#housing-rooms');
+  var housingGuests = map.querySelector('#housing-guests');
+  var housingFeatures = map.querySelector('#housing-features');
 
   // вспомогательные функции
   // выбрать случайное число от.. до..
@@ -142,21 +142,10 @@
     document.addEventListener('mouseup', mouseUpHandler);
   });
 
-  var housingArrayHouse = [];
-  var housingArrayFlat = [];
-  var housingArrayBungalo = [];
 
-  var filterHousingArray = function () {
-    housingArrayHouse = window.mainHousingArray.filter(function (flat) {
-      return flat.offer.type === 'house';
-    });
-    housingArrayFlat = window.mainHousingArray.filter(function (flat) {
-      return flat.offer.type === 'flat';
-    });
-    housingArrayBungalo = window.mainHousingArray.filter(function (flat) {
-      return flat.offer.type === 'bungalo';
-    });
-  };
+  // var filterHousingArray = function (evt) {
+  //   console.log(evt.target);
+  // };
 
   var deleteAllPins = function () {
     var pins = map.querySelectorAll('.map__pin:not(.map__pin--main)');
@@ -164,26 +153,74 @@
       pins[i].remove();
     }
   };
+  var filteredHouses = [];
+  var filteredFlats = [];
+  var filteredBungalos = [];
+  var filteredRooms1 = [];
+  var filteredRooms2 = [];
+  var filteredRooms3 = [];
+  var filteredArray = [];
+  var newArray = [];
 
-  // фильтрация
-  var housingTypeChangeHandler = function (evt) {
-    deleteAllPins();
-    filterHousingArray();
-    switch (evt.target.value) {
-      case 'house':
-        window.pin.createAllPins(housingArrayHouse, housingArrayHouse.length);
-        break;
-      case 'flat':
-        window.pin.createAllPins(housingArrayFlat, housingArrayFlat.length);
-        break;
-      case 'bungalo':
-        window.pin.createAllPins(housingArrayBungalo, housingArrayFlat.length);
-        break;
-      default:
-        window.pin.createAllPins(window.mainHousingArray, window.mainHousingArray.length);
+  var makeFilteredArraysPerType = function () {
+    for (var i = 0; i < window.mainHousingArray.length; i++) {
+      if (window.mainHousingArray[i].offer.type !== 'house') {
+        filteredHouses.push(i);
+      }
+      if (window.mainHousingArray[i].offer.type !== 'flat') {
+        filteredFlats.push(i);
+      }
+      if (window.mainHousingArray[i].offer.type !== 'bungalo') {
+        filteredBungalos.push(i);
+      }
+      if (window.mainHousingArray[i].offer.rooms != '1') {
+        filteredRooms1.push(i);
+      }
+      if (window.mainHousingArray[i].offer.rooms != '2') {
+        filteredRooms2.push(i);
+      }
+      if (window.mainHousingArray[i].offer.rooms != '3') {
+        filteredRooms3.push(i);
+      }
     }
   };
 
+  // remove duplicates
+// тут должна быть функция по удалению дупликатов
+
+  // фильтрация
+  var housingTypeChangeHandler = function (evt) {
+    filteredArray = [];
+    // debugger;
+    window.arrayToComeBack = window.mainHousingArray;
+    newArray = window.arrayToComeBack;
+    deleteAllPins();
+    makeFilteredArraysPerType();
+    if (housingType.value === 'house') {
+      filteredArray.push(filteredHouses);
+    }
+    if (housingType.value === 'flat') {
+      filteredArray.push(filteredFlats);
+    }
+    if (housingType.value === 'bungalo') {
+      filteredArray.push(filteredBungalos);
+    } if (housingRooms.value === '1') {
+      filteredArray.push(filteredRooms1);
+    }
+    // debugger;
+    console.log(filteredArray);
+    var arrUnique = unique(filteredArray);
+    console.log(arrUnique);
+    // var newArray = window.mainHousingArray;
+    // var filteredArray = [];
+    // var ;
+    // window.pin.createAllPins(filteredArray, filteredArray.length);
+  };
+
   housingType.addEventListener('change', housingTypeChangeHandler);
+  housingPrice.addEventListener('change', housingTypeChangeHandler);
+  housingGuests.addEventListener('change', housingTypeChangeHandler);
+  housingRooms.addEventListener('change', housingTypeChangeHandler);
+  housingFeatures.addEventListener('change', housingTypeChangeHandler);
 
 })();
