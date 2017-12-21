@@ -7,7 +7,7 @@
 
   // что происходит при открытии пина
   var pinClickHandler = function (evt) {
-    window.showCard(evt);
+    window.card.showCard(evt);
   };
 
   // если нажали на Enter

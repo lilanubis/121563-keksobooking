@@ -55,6 +55,7 @@
     offerTemplate.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + offer.checkin + ', выезд до ' + offer.checkout;
     offerTemplate.querySelector('p:nth-of-type(5)').textContent = offer.description;
     offerTemplate.querySelector('img').src = offerData.author.avatar;
+    offerTemplate.querySelector('.popup__features').textContent = '';
 
     var featuresHtmlString = '';
     for (var i = 0; i < offerData.offer.features.length; i++) {

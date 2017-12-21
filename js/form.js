@@ -21,6 +21,15 @@
   var housingFeatures = map.querySelector('#housing-features');
   window.filters = [];
 
+  // debounce
+  var lastTimeout;
+  window.debounce = function (fun) {
+    if (lastTimeout) {
+      window.clearTimeout(lastTimeout);
+    }
+    lastTimeout = window.setTimeout(fun, window.data.TIMEOUT_DEBOUNCE);
+  };
+
   var selectStateChanged = function (target) {
     if (target.value !== 'any') {
       var isFilterExist = window.filters.find(function (filterObj) {
@@ -83,9 +92,7 @@
 
     window.card.closeCard();
     window.pin.deleteAllPins();
-    window.setTimeout(function () {
-      window.pin.renderPins();
-    }, window.data.TIMEOUT_DEBOUNCE);
+    window.debounce(window.pin.renderPins);
   };
 
   housingType.addEventListener('change', updateFilter);
