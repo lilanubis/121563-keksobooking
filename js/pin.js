@@ -46,7 +46,6 @@
       filtered = [];
 
       currentFilteredPins.forEach(function (pinItem) {
-        currentFilters = window.form.getCurrentFilters();
         var currentFilter = currentFilters[index];
         switch (currentFilter.id) {
           case 'housing-type':

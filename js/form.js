@@ -228,10 +228,10 @@
   };
   window.form = {
     enableForm: enableForm,
-    setAddressCoordinates: function setAddressCoordinates(x, y) {
+    setAddressCoordinates: function (x, y) {
       accommodationAddress.value = 'x: ' + x + ', y: ' + y;
     },
-    getCurrentFilters: function getCurrentFilters() {
+    getCurrentFilters: function () {
       return filters;
     }
   };
