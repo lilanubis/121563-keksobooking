@@ -30,9 +30,10 @@
     return pin;
   };
   var createFilteredPinsArray = function (pinsArray) {
+    var currentFilters = window.form.getCurrentFilters();
     var filtered;
     var currentFilteredPins;
-    for (var index = 0, len = window.filters.length; index < len; index++) {
+    for (var index = 0, len = currentFilters.length; index < len; index++) {
       if (index === 0) {
         currentFilteredPins = pinsArray;
       } else {
@@ -45,7 +46,8 @@
       filtered = [];
 
       currentFilteredPins.forEach(function (pinItem) {
-        var currentFilter = window.filters[index];
+        currentFilters = window.form.getCurrentFilters();
+        var currentFilter = currentFilters[index];
         switch (currentFilter.id) {
           case 'housing-type':
             if (pinItem.offer.type === currentFilter.value) {
@@ -95,8 +97,9 @@
 
   // собираем все пины из реальных данных
   var renderPins = function () {
+    var currentFilters = window.form.getCurrentFilters();
     var fragmentPin = document.createDocumentFragment();
-    var pinsArray = window.filters.length ? createFilteredPinsArray(window.mainHousingArray) : window.mainHousingArray;
+    var pinsArray = currentFilters.length ? createFilteredPinsArray(window.mainHousingArray) : window.mainHousingArray;
     var pinCount = pinsArray.length < 5 ? pinsArray.length : window.data.NUMBER_OF_OFFERS;
     for (var l = 0; l < pinCount; l++) {
       fragmentPin.appendChild(createPin(pinsArray[l], pinTemplate));

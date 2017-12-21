@@ -19,11 +19,11 @@
   var housingRooms = map.querySelector('#housing-rooms');
   var housingGuests = map.querySelector('#housing-guests');
   var housingFeatures = map.querySelector('#housing-features');
-  window.filters = [];
+  var filters = [];
 
   // debounce
   var lastTimeout;
-  window.debounce = function (fun) {
+  var debounce = function (fun) {
     if (lastTimeout) {
       window.clearTimeout(lastTimeout);
     }
@@ -32,7 +32,7 @@
 
   var selectStateChanged = function (target) {
     if (target.value !== 'any') {
-      var isFilterExist = window.filters.find(function (filterObj) {
+      var isFilterExist = filters.find(function (filterObj) {
         var isFound;
         if (filterObj.id === target.id) {
           filterObj.value = target.value;
@@ -44,13 +44,13 @@
       });
 
       if (!isFilterExist) {
-        window.filters.push({
+        filters.push({
           id: target.id,
           value: target.value
         });
       }
     } else {
-      window.filters = window.filters.filter(function (filterObject) {
+      filters = filters.filter(function (filterObject) {
         return filterObject.id !== target.id;
       });
     }
@@ -68,7 +68,7 @@
       });
     });
 
-    var isFeaturesFilterExist = window.filters.find(function (filterObj) {
+    var isFeaturesFilterExist = filters.find(function (filterObj) {
       if (filterObj.id === currentTarget.id) {
         filterObj.features = featureFilterObject.features;
         return true;
@@ -77,7 +77,7 @@
       }
     });
     if (!isFeaturesFilterExist) {
-      window.filters.push(featureFilterObject);
+      filters.push(featureFilterObject);
     }
   };
 
@@ -92,7 +92,7 @@
 
     window.card.closeCard();
     window.pin.deleteAllPins();
-    window.debounce(window.pin.renderPins);
+    debounce(window.pin.renderPins);
   };
 
   housingType.addEventListener('change', updateFilter);
@@ -230,6 +230,9 @@
     enableForm: enableForm,
     setAddressCoordinates: function setAddressCoordinates(x, y) {
       accommodationAddress.value = 'x: ' + x + ', y: ' + y;
+    },
+    getCurrentFilters: function getCurrentFilters() {
+      return filters;
     }
   };
 })();
