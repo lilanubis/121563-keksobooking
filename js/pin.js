@@ -31,7 +31,7 @@
   };
   var createFilteredPinsArray = function (pinsArray) {
     var currentFilters = window.form.getCurrentFilters();
-    var filtered;
+    var filtered = [];
     var currentFilteredPins;
     for (var index = 0, len = currentFilters.length; index < len; index++) {
       if (index === 0) {
@@ -112,7 +112,7 @@
     renderPins(response);
   };
   var onError = function (errorMessage) {
-    window.showErrorMessage(errorMessage);
+    window.backend.showErrorMessage(errorMessage);
   };
   // создаем события для шелчка по главному Пину
   var mainPinMouseupHandler = function () {
