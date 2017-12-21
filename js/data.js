@@ -48,5 +48,8 @@ window.data = {
   ENTER_KEYCODE: 13,
   // переменные для адресов куда грузить данные / откуда выгружать данные
   URL_SAVE: 'https://1510.dump.academy/keksobooking',
-  URL_LOAD: 'https://1510.dump.academy/keksobooking/data'
+  URL_LOAD: 'https://1510.dump.academy/keksobooking/data',
+  // timeout
+  TIMEOUT_DEBOUNCE: 500,
+  TIMEOUT_ERROR: 5000
 };

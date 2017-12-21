@@ -75,7 +75,6 @@
   var updateFilter = function (evt) {
     var target = evt.target;
     var currentTarget = evt.currentTarget;
-    // если это не чекбоксы с "фичами" то
     if (currentTarget.id !== 'housing-features') {
       selectStateChanged(target);
     } else {
@@ -84,7 +83,9 @@
 
     window.card.closeCard();
     window.pin.deleteAllPins();
-    window.pin.renderPins();
+    window.setTimeout(function () {
+      window.pin.renderPins();
+    }, window.data.TIMEOUT_DEBOUNCE);
   };
 
   housingType.addEventListener('change', updateFilter);
@@ -207,7 +208,7 @@
     document.querySelector('.map').insertAdjacentElement('afterbegin', errorPopup);
     window.setTimeout(function () {
       errorPopup.remove();
-    }, 5000);
+    }, window.data.TIMEOUT_ERROR);
   };
 
   // функция для показа формы (для использования при клике по главному пину)
