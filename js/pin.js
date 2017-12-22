@@ -3,20 +3,11 @@
   var map = document.querySelector('.map');
   var mainPin = map.querySelector('.map__pin--main');
   var pinTemplate = document.querySelector('template').content.querySelector('.map__pin');
-  var mapPins = document.querySelector('.map__pins');
+  var mapPins = map.querySelector('.map__pins');
 
   // что происходит при открытии пина
   var pinClickHandler = function (evt) {
-    var activePopup = document.querySelector('.map__card.popup');
-    // если карточки на экране нет
-    if (!activePopup) {
-      window.showCard(evt);
-
-    // если карточка на экране уже есть
-    } else {
-      window.card.closePopup();
-      window.showCard(evt);
-    }
+    window.card.showCard(evt);
   };
 
   // если нажали на Enter
@@ -38,22 +29,90 @@
 
     return pin;
   };
+  var createFilteredPinsArray = function (pinsArray) {
+    var currentFilters = window.form.getCurrentFilters();
+    var filtered = [];
+    var currentFilteredPins;
+    for (var index = 0, len = currentFilters.length; index < len; index++) {
+      if (index === 0) {
+        currentFilteredPins = pinsArray;
+      } else {
+        if (filtered.length) {
+          currentFilteredPins = filtered;
+        } else {
+          break;
+        }
+      }
+      filtered = [];
+
+      currentFilteredPins.forEach(function (pinItem) {
+        var currentFilter = currentFilters[index];
+        switch (currentFilter.id) {
+          case 'housing-type':
+            if (pinItem.offer.type === currentFilter.value) {
+              filtered.push(pinItem);
+            }
+            break;
+          case 'housing-price':
+            if (currentFilter.value === 'middle' && pinItem.offer.price >= 10000 && pinItem.offer.price <= 50000) {
+              filtered.push(pinItem);
+            } else if (currentFilter.value === 'low' && pinItem.offer.price < 10000) {
+              filtered.push(pinItem);
+            } else if (currentFilter.value === 'high' && pinItem.offer.price > 50000) {
+              filtered.push(pinItem);
+            }
+            break;
+          case 'housing-rooms':
+            if (pinItem.offer.rooms === Number.parseInt(currentFilter.value, 10)) {
+              filtered.push(pinItem);
+            }
+            break;
+          case 'housing-guests':
+            if (pinItem.offer.guests >= Number.parseInt(currentFilter.value, 10)) {
+              filtered.push(pinItem);
+            }
+            break;
+          case 'housing-features':
+            var featureExitsInPin = true;
+            for (var i = 0; i < currentFilter.features.length; i++) {
+              var currentFilterFeature = currentFilter.features[i];
+              if (currentFilterFeature.checked) {
+                featureExitsInPin = pinItem.offer.features.indexOf(currentFilterFeature.featureName) !== -1;
+                if (!featureExitsInPin) {
+                  break;
+                }
+              }
+            }
+
+            if (featureExitsInPin) {
+              filtered.push(pinItem);
+            }
+            break;
+        }
+      });
+    }
+    return filtered || [];
+  };
 
   // собираем все пины из реальных данных
-  var createAllPins = function (array) {
+  var renderPins = function () {
+    var currentFilters = window.form.getCurrentFilters();
     var fragmentPin = document.createDocumentFragment();
-    for (var l = 0; l < array.length; l++) {
-      fragmentPin.appendChild(createPin(array[l], pinTemplate));
+    var pinsArray = currentFilters.length ? createFilteredPinsArray(window.mainHousingArray) : window.mainHousingArray;
+    var pinCount = pinsArray.length < 5 ? pinsArray.length : window.data.NUMBER_OF_OFFERS;
+    for (var l = 0; l < pinCount; l++) {
+      fragmentPin.appendChild(createPin(pinsArray[l], pinTemplate));
     }
     mapPins.appendChild(fragmentPin);
   };
 
   // обработчики
   var onLoad = function (response) {
-    createAllPins(response);
+    window.mainHousingArray = response;
+    renderPins(response);
   };
   var onError = function (errorMessage) {
-    window.showErrorMessage(errorMessage);
+    window.backend.showErrorMessage(errorMessage);
   };
   // создаем события для шелчка по главному Пину
   var mainPinMouseupHandler = function () {
@@ -62,11 +121,18 @@
     document.querySelector('.map').classList.remove('map--faded');
     window.form.enableForm();
   };
+  var deleteAllPins = function () {
+    var pins = map.querySelectorAll('.map__pin:not(.map__pin--main)');
+    for (var i = 0; i < pins.length; i++) {
+      pins[i].remove();
+    }
+  };
 
   // щелкаем по главному пину
   mainPin.addEventListener('mouseup', mainPinMouseupHandler);
 
   window.pin = {
-    createAllPins: createAllPins
+    renderPins: renderPins,
+    deleteAllPins: deleteAllPins
   };
 })();
