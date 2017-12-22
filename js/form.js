@@ -149,15 +149,19 @@
 
   // синхронизируем количество комнат с количеством гостей
   // обработчик события на селект с количеством комнат
-  var roomNumberSelectHadler = function (evt) {
-    var roomCount = evt.target.value;
+  var roomNumberSelectHandler = function () {
+    synchronizeGuestsToRoomsCount();
+  };
+
+  var synchronizeGuestsToRoomsCount = function () {
+    var roomCount = roomNumberSelect.value;
+    var suitableCapacity = window.data.ROOM_CAPACITY[roomCount];
     var options = capacitySelect.options;
     var hasSelected = false;
 
     for (i = 0; i < options.length; i++) {
       var currentOption = options[i];
       var currentOptionValue = currentOption.value;
-      var suitableCapacity = window.data.ROOM_CAPACITY[roomCount];
       var isDisabled = suitableCapacity.indexOf(currentOptionValue) === -1;
       currentOption.selected = false;
       currentOption.disabled = isDisabled;
@@ -168,7 +172,7 @@
     }
   };
 
-  roomNumberSelect.addEventListener('input', roomNumberSelectHadler);
+  roomNumberSelect.addEventListener('input', roomNumberSelectHandler);
 
   //  проверяем валидность формы
   // объявление функции, проверяющей валидность
@@ -211,11 +215,13 @@
   // функция для показа формы (для использования при клике по главному пину)
   var enableForm = function () {
     noticeForm.classList.remove('notice__form--disabled');
+    synchronizeGuestsToRoomsCount();
     for (i = 0; i < fieldsets.length; i++) {
       fieldsets[i].removeAttribute('disabled', 'disabled');
     }
     window.synchronizeFields(accommodationTypeSelect, accommodationPriceInput, accommodations, prices, syncValueWithMin);
   };
+
   window.form = {
     enableForm: enableForm,
     setAddressCoordinates: function (x, y) {

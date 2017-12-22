@@ -1,7 +1,6 @@
 'use strict';
 (function () {
   var map = document.querySelector('.map');
-  var popupCloseButton = map.querySelector('.popup__close');
 
   // взять ключ от объекта
   var getKeyValue = function (obj, key) {
@@ -23,7 +22,7 @@
     var activePopup = document.querySelector('.map__card.popup');
     if (activePopup) {
       var activePin = document.querySelector('.map__pin.map__pin--active');
-      popupCloseButton = activePopup.querySelector('.popup__close');
+      var popupCloseButton = activePopup.querySelector('.popup__close');
       popupCloseButton.removeEventListener('click', popupCloseButtonClickHandler);
       activePopup.remove();
       map.removeEventListener('keydown', popupCloseButtonEscKeydownHandler);
@@ -81,7 +80,7 @@
     map.insertBefore(offerElement, map.children[1]);
 
     // слушаем клики
-    popupCloseButton = document.querySelector('.popup__close');
+    var popupCloseButton = document.querySelector('.popup__close');
     popupCloseButton.addEventListener('click', closePopup);
     popupCloseButton.addEventListener('keydown', popupCloseButtonEscKeydownHandler);
     popupCloseButton.addEventListener('keydown', popupCloseButtonEnterKeyDownHandler);
