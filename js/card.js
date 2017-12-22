@@ -81,7 +81,7 @@
     map.insertBefore(offerElement, map.children[1]);
 
     // слушаем клики
-    var popupCloseButton = document.querySelector('.popup__close');
+    popupCloseButton = document.querySelector('.popup__close');
     popupCloseButton.addEventListener('click', closePopup);
     popupCloseButton.addEventListener('keydown', popupCloseButtonEscKeydownHandler);
     popupCloseButton.addEventListener('keydown', popupCloseButtonEnterKeyDownHandler);
