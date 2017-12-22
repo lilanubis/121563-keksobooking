@@ -216,10 +216,10 @@
   var enableForm = function () {
     noticeForm.classList.remove('notice__form--disabled');
     synchronizeGuestsToRoomsCount();
+    window.synchronizeFields(accommodationTypeSelect, accommodationPriceInput, accommodations, prices, syncValueWithMin);
     for (i = 0; i < fieldsets.length; i++) {
       fieldsets[i].removeAttribute('disabled', 'disabled');
     }
-    window.synchronizeFields(accommodationTypeSelect, accommodationPriceInput, accommodations, prices, syncValueWithMin);
   };
 
   window.form = {
