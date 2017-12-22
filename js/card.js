@@ -11,7 +11,7 @@
     closePopup();
     var pinData = evt.currentTarget.pinData;
     var activePin = evt.currentTarget;
-    createActiveOffer(pinData, document.querySelector('template'));
+    createActiveOffer(pinData);
     activePin.classList.add('map__pin--active');
     map.addEventListener('keydown', popupCloseButtonKeydownHandler);
   };

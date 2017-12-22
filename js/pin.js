@@ -31,45 +31,45 @@
   };
   var createFilteredPinsArray = function (pinsArray) {
     var currentFilters = window.form.getCurrentFilters();
-    var filtered = [];
+    var filteredPins = [];
     var currentFilteredPins;
     for (var index = 0, len = currentFilters.length; index < len; index++) {
       if (index === 0) {
         currentFilteredPins = pinsArray;
       } else {
-        if (filtered.length) {
-          currentFilteredPins = filtered;
+        if (filteredPins.length) {
+          currentFilteredPins = filteredPins;
         } else {
           break;
         }
       }
-      filtered = [];
+      filteredPins = [];
 
       currentFilteredPins.forEach(function (pinItem) {
         var currentFilter = currentFilters[index];
         switch (currentFilter.id) {
           case 'housing-type':
             if (pinItem.offer.type === currentFilter.value) {
-              filtered.push(pinItem);
+              filteredPins.push(pinItem);
             }
             break;
           case 'housing-price':
             if (currentFilter.value === 'middle' && pinItem.offer.price >= 10000 && pinItem.offer.price <= 50000) {
-              filtered.push(pinItem);
+              filteredPins.push(pinItem);
             } else if (currentFilter.value === 'low' && pinItem.offer.price < 10000) {
-              filtered.push(pinItem);
+              filteredPins.push(pinItem);
             } else if (currentFilter.value === 'high' && pinItem.offer.price > 50000) {
-              filtered.push(pinItem);
+              filteredPins.push(pinItem);
             }
             break;
           case 'housing-rooms':
             if (pinItem.offer.rooms === Number.parseInt(currentFilter.value, 10)) {
-              filtered.push(pinItem);
+              filteredPins.push(pinItem);
             }
             break;
           case 'housing-guests':
             if (pinItem.offer.guests >= Number.parseInt(currentFilter.value, 10)) {
-              filtered.push(pinItem);
+              filteredPins.push(pinItem);
             }
             break;
           case 'housing-features':
@@ -85,13 +85,13 @@
             }
 
             if (featureExitsInPin) {
-              filtered.push(pinItem);
+              filteredPins.push(pinItem);
             }
             break;
         }
       });
     }
-    return filtered || [];
+    return filteredPins || [];
   };
 
   // собираем все пины из реальных данных
