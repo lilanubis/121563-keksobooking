@@ -1,6 +1,7 @@
 'use strict';
 (function () {
   var map = document.querySelector('.map');
+  var popupCloseButton = map.querySelector('.popup__close');
 
   // взять ключ от объекта
   var getKeyValue = function (obj, key) {
@@ -13,7 +14,8 @@
     var activePin = evt.currentTarget;
     createActiveOffer(pinData);
     activePin.classList.add('map__pin--active');
-    map.addEventListener('keydown', popupCloseButtonKeydownHandler);
+    map.addEventListener('keydown', popupCloseButtonEscKeydownHandler);
+    map.addEventListener('keydown', popupCloseButtonEnterKeyDownHandler);
   };
 
   // что происходит при закрытии карточки
@@ -21,10 +23,11 @@
     var activePopup = document.querySelector('.map__card.popup');
     if (activePopup) {
       var activePin = document.querySelector('.map__pin.map__pin--active');
-      var popupCloseButton = activePopup.querySelector('.popup__close');
+      popupCloseButton = activePopup.querySelector('.popup__close');
       popupCloseButton.removeEventListener('click', popupCloseButtonClickHandler);
       activePopup.remove();
-      map.removeEventListener('keydown', popupCloseButtonKeydownHandler);
+      map.removeEventListener('keydown', popupCloseButtonEscKeydownHandler);
+      popupCloseButton.removeEventListener('keydown', popupCloseButtonEnterKeyDownHandler);
       if (activePin) {
         document.querySelector('.map__pin.map__pin--active').classList.remove('map__pin--active');
       }
@@ -36,9 +39,16 @@
     closePopup();
   };
 
-  // если нажали на Esc или на enter по крестику
-  var popupCloseButtonKeydownHandler = function (event) {
-    if (event.keyCode === window.data.ESC_KEYCODE || event.keyCode === window.data.ENTER_KEYCODE) {
+  // если нажали на Esc...
+  var popupCloseButtonEscKeydownHandler = function (event) {
+    if (event.keyCode === window.data.ESC_KEYCODE) {
+      closePopup();
+    }
+  };
+
+  // ... или на enter по крестику
+  var popupCloseButtonEnterKeyDownHandler = function (event) {
+    if (event.keyCode === window.data.ENTER_KEYCODE) {
       closePopup();
     }
   };
@@ -73,7 +83,8 @@
     // слушаем клики
     var popupCloseButton = document.querySelector('.popup__close');
     popupCloseButton.addEventListener('click', closePopup);
-    popupCloseButton.addEventListener('keydown', popupCloseButtonKeydownHandler);
+    popupCloseButton.addEventListener('keydown', popupCloseButtonEscKeydownHandler);
+    popupCloseButton.addEventListener('keydown', popupCloseButtonEnterKeyDownHandler);
   };
 
   window.card = {
